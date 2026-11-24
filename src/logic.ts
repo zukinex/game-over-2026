@@ -61,10 +61,31 @@ export function isTimeUp(secondsElapsed: number): boolean {
   return secondsElapsed >= FIGHT_TIME_LIMIT_S
 }
 
-/** Final score: win bonus + time bonus + shard score. */
-export function scoreFor(secondsElapsed: number, shardsSmashed: number): number {
+/** Breakable shoulder spikes: the hidden weakness. The center spike hides
+ *  behind the head, so only the two shoulder spikes are clickable. */
+export const SPIKE_COUNT = 2
+export const SPIKE_MAX_HP = 30
+/** Damage a spike click deals to the boss body. */
+export const SPIKE_CLICK_BOSS_DAMAGE = 5
+/** Body-hit damage multiplier once the core is exposed. */
+export const CORE_EXPOSED_MULTIPLIER = 2
+/** Score per shattered spike. */
+export const SPIKE_SCORE = 150
+
+/** Damage of a body hit: doubled once the core is exposed. */
+export function bodyHitDamage(coreExposed: boolean): number {
+  return PLAYER_ATTACK_DAMAGE * (coreExposed ? CORE_EXPOSED_MULTIPLIER : 1)
+}
+
+/** True when every breakable spike is shattered. */
+export function allSpikesBroken(brokenCount: number): boolean {
+  return brokenCount >= SPIKE_COUNT
+}
+
+/** Final score: win bonus + time bonus + shard score + spike score. */
+export function scoreFor(secondsElapsed: number, shardsSmashed: number, spikesBroken = 0): number {
   const timeBonus = Math.max(0, FIGHT_TIME_LIMIT_S - Math.floor(secondsElapsed)) * TIME_BONUS_PER_SECOND
-  return WIN_BONUS + timeBonus + shardsSmashed * SHARD_SCORE
+  return WIN_BONUS + timeBonus + shardsSmashed * SHARD_SCORE + spikesBroken * SPIKE_SCORE
 }
 
 /** "M:SS" timer format. */

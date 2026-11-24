@@ -117,6 +117,7 @@ const hudComponent = () => (
         <Label value={`Time: ${formatTime(hudState.timeS)}`} fontSize={20} color={Color4.White()} textAlign="middle-center" uiTransform={{ width: 520, height: 30 }} />
         <Label value={`Score: ${hudState.score}`} fontSize={20} color={Color4.White()} textAlign="middle-center" uiTransform={{ width: 520, height: 30 }} />
         <Label value={`Shards smashed: ${hudState.shardsSmashed}`} fontSize={16} color={Color4.create(0.8, 0.8, 0.8, 1)} textAlign="middle-center" uiTransform={{ width: 520, height: 26 }} />
+        <Label value={`Spikes shattered: ${hudState.spikesBroken} / 2`} fontSize={16} color={Color4.create(0.8, 0.8, 0.8, 1)} textAlign="middle-center" uiTransform={{ width: 520, height: 26 }} />
         <Button
           uiTransform={{ width: 220, height: 56, margin: '20px 0 0 0' }}
           value="PLAY AGAIN"

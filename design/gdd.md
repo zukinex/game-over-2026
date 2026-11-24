@@ -29,7 +29,23 @@ dodge its telegraphed attacks, and kill it in under 5 minutes.
 
 - Player attack: 10 per click. Boss HP 300 = 30 hits.
 - Slam hit: 20. Projectile hit: 10. Shard touch: 10.
-- Score: 1000 win bonus + max(0, 300 − seconds) × 10 time bonus + 100/shard.
+- Score: 1000 win bonus + max(0, 300 − seconds) × 10 time bonus + 100/shard
+  + 150/shattered spike.
+
+## Hidden weakness — breakable spikes (added 2026-11-24, v2 combo)
+
+- The two SHOULDER spikes are clickable (hover shows "???" on purpose).
+  The center spike hides behind the head, so it is visual-only.
+- Each shoulder spike has 30 HP (3 clicks). A spike click also deals 5
+  damage to the boss. Spikes share the 0.4 s attack cooldown with body hits.
+- Clues (the secret is never explained in the intro): spikes glint with a
+  pulsing emissive and dim as they crack; phase taunts hint at the weakness
+  ("My heart is safe!" / "My spikes guard my heart!").
+- Shatter BOTH spikes → the core is exposed (turns gold), body hits deal 2x
+  (20) for the rest of the fight. +150 score per shattered spike.
+- Hitbox was shrunk (top y 3.2) so spike tips stay clickable; the head is
+  not clickable. Spike hits flash white; broken spikes hide.
+- Replay (PLAY AGAIN / TRY AGAIN) restores spikes, core color and state.
 
 ## What the judges score (7 criteria, equal weight)
 

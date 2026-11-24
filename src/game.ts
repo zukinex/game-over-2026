@@ -25,6 +25,9 @@ import {
   PLAYER_MAX_HP,
   PLAYER_ATTACK_DAMAGE,
   PLAYER_ATTACK_COOLDOWN_S,
+  SPIKE_COUNT,
+  SPIKE_MAX_HP,
+  SPIKE_CLICK_BOSS_DAMAGE,
   SHARDS_PER_SUMMON,
   SHARD_HEAL,
   SHARD_SCORE,
@@ -32,6 +35,8 @@ import {
   attackCooldownForPhase,
   phaseForHp,
   volleyCountForPhase,
+  bodyHitDamage,
+  allSpikesBroken,
   clampHp,
   distanceXZ,
   insideSlamDisc,
@@ -51,6 +56,7 @@ export const hudState: {
   timeS: number
   score: number
   shardsSmashed: number
+  spikesBroken: number
   banner: string | null
 } = {
   phase: 'intro',
@@ -61,6 +67,7 @@ export const hudState: {
   timeS: 0,
   score: 0,
   shardsSmashed: 0,
+  spikesBroken: 0,
   banner: null
 }
 
@@ -78,6 +85,13 @@ let bossYaw = 0
 let hitFlashT = 0
 let bannerUntil = 0
 let shardsSmashed = 0
+let spikesBroken = 0
+let coreExposed = false
+let spikeHp: number[] = [SPIKE_MAX_HP, SPIKE_MAX_HP]
+let spikeFlashT: number[] = [0, 0]
+// Breakable shoulder spikes (Spike2 left, Spike3 right). Spike1 (center)
+// hides behind the head, so it stays visual-only.
+let breakableSpikes: Entity[] = []
 
 const SLAM_RADIUS = 2.5
 const SLAM_TELEGRAPH_S = 0.9
@@ -126,8 +140,9 @@ function syncHud() {
   hudState.playerHp = playerHp
   hudState.timeS = timeS
   hudState.shardsSmashed = shardsSmashed
+  hudState.spikesBroken = spikesBroken
   hudState.score =
-    state === 'victory' ? scoreFor(timeS, shardsSmashed) : hudState.score
+    state === 'victory' ? scoreFor(timeS, shardsSmashed, spikesBroken) : hudState.score
 }
 
 function damagePlayer(amount: number) {
@@ -148,9 +163,9 @@ function damageBoss(amount: number) {
   hitFlashT = 0.15
   const nextPhase = phaseForHp(bossHp)
   if (nextPhase !== prevPhase) {
-    if (nextPhase === 2) showBanner('The Golem grows angry! Crystal Volley incoming!')
+    if (nextPhase === 2) showBanner("Phase 2! 'My heart is safe!' — Volley incoming!")
     if (nextPhase === 3) {
-      showBanner('FINAL PHASE! The Golem summons shards!')
+      showBanner("FINAL PHASE! 'My spikes guard my heart!'")
       enrageBoss()
     }
   }
@@ -162,11 +177,14 @@ function damageBoss(amount: number) {
   syncHud()
 }
 
-/** Phase 3: core + spikes turn magenta. */
+/** Phase 3: core + spikes turn magenta (the exposed core keeps its gold). */
 function enrageBoss() {
   const magenta = Color4.fromHexString('#e879f9')
   const glow = Color4.fromHexString('#d946ef')
-  for (const e of [bossChestCore, bossSpike1, bossSpike2, bossSpike3]) {
+  const targets = coreExposed
+    ? [bossSpike1, bossSpike2, bossSpike3]
+    : [bossChestCore, bossSpike1, bossSpike2, bossSpike3]
+  for (const e of targets) {
     if (!e) continue
     Material.setPbrMaterial(e, {
       albedoColor: magenta,
@@ -176,6 +194,48 @@ function enrageBoss() {
       metallic: 0.1
     })
   }
+}
+
+/** Click a shoulder spike: it cracks, deals a little body damage, and after
+ *  enough hits it shatters. Shatter every breakable spike to expose the core. */
+function damageSpike(index: number) {
+  if (state !== 'fight') return
+  if (spikeHp[index] <= 0) return
+  if (timeS - lastPlayerAttackAt < PLAYER_ATTACK_COOLDOWN_S) return
+  lastPlayerAttackAt = timeS
+  spikeHp[index] = Math.max(0, spikeHp[index] - PLAYER_ATTACK_DAMAGE)
+  spikeFlashT[index] = 0.15
+  damageBoss(SPIKE_CLICK_BOSS_DAMAGE)
+  if (state !== 'fight') {
+    syncHud()
+    return
+  }
+  if (spikeHp[index] <= 0) {
+    spikesBroken++
+    const e = breakableSpikes[index]
+    if (e) VisibilityComponent.createOrReplace(e, { visible: false })
+    if (allSpikesBroken(spikesBroken)) {
+      exposeCore()
+    } else {
+      showBanner(`A crystal spike shatters! (${spikesBroken}/${SPIKE_COUNT})`)
+    }
+  }
+  syncHud()
+}
+
+/** All breakable spikes shattered: the core stays exposed, body hits deal 2x. */
+function exposeCore() {
+  coreExposed = true
+  if (bossChestCore) {
+    Material.setPbrMaterial(bossChestCore, {
+      albedoColor: Color4.fromHexString('#fbbf24'),
+      emissiveColor: Color4.fromHexString('#f59e0b'),
+      emissiveIntensity: 3.5,
+      roughness: 0.2,
+      metallic: 0.1
+    })
+  }
+  showBanner('The core is exposed! Strike now!', 4)
 }
 
 function clearRuntimeEntities() {
@@ -211,6 +271,10 @@ export function resetFight() {
   lastPlayerAttackAt = -1
   dyingT = 0
   shardsSmashed = 0
+  spikesBroken = 0
+  coreExposed = false
+  spikeHp = [SPIKE_MAX_HP, SPIKE_MAX_HP]
+  spikeFlashT = [0, 0]
   hitFlashT = 0
   // Restore the boss: visible, upright, facing the spawn (-Z).
   if (bossRoot) {
@@ -231,6 +295,11 @@ export function resetFight() {
       roughness: 0.2,
       metallic: 0.1
     })
+  }
+  // Un-hide any shattered spikes.
+  for (const e of breakableSpikes) {
+    if (!e) continue
+    VisibilityComponent.createOrReplace(e, { visible: true })
   }
   state = 'fight'
   showBanner('Round two — the Golem awakens!')
@@ -345,6 +414,47 @@ function bossAnimSystem(dt: number) {
     const s = 0.7 + Math.sin(clock * 9 + i * 1.7) * 0.08
     t.scale = { x: s, y: s * 1.15, z: s }
   }
+
+  // Breakable spikes glint (the hidden clue): bright cyan pulse, dimming as
+  // they crack. A fresh hit flashes white. In phase 3 they keep the enrage
+  // magenta instead of pulsing.
+  const phaseNow = phaseForHp(bossHp)
+  for (let i = 0; i < breakableSpikes.length; i++) {
+    const e = breakableSpikes[i]
+    if (!e || spikeHp[i] <= 0) continue
+    if (spikeFlashT[i] > 0) {
+      spikeFlashT[i] = Math.max(0, spikeFlashT[i] - dt)
+      Material.setPbrMaterial(e, {
+        albedoColor: Color4.White(),
+        emissiveColor: Color4.White(),
+        emissiveIntensity: 4,
+        roughness: 0.2,
+        metallic: 0.1
+      })
+      continue
+    }
+    if (phaseNow >= 3) {
+      Material.setPbrMaterial(e, {
+        albedoColor: Color4.fromHexString('#e879f9'),
+        emissiveColor: Color4.fromHexString('#d946ef'),
+        emissiveIntensity: 2.5,
+        roughness: 0.2,
+        metallic: 0.1
+      })
+      continue
+    }
+    const hpFrac = spikeHp[i] / SPIKE_MAX_HP
+    const pulse = 1.5 + Math.sin(clock * 2.5 + i * 2.1) * 0.9
+    const dim = 0.45 + 0.55 * hpFrac
+    Material.setPbrMaterial(e, {
+      albedoColor: Color4.fromHexString('#22d3ee'),
+      emissiveColor: Color4.fromHexString('#22d3ee'),
+      emissiveIntensity: pulse * dim,
+      roughness: 0.2,
+      metallic: 0.1
+    })
+  }
+
   if (!bossRoot) return
 
   // Face the player (smooth turn).
@@ -512,10 +622,25 @@ export function setupGame() {
         if (state !== 'fight') return
         if (timeS - lastPlayerAttackAt < PLAYER_ATTACK_COOLDOWN_S) return
         lastPlayerAttackAt = timeS
-        damageBoss(PLAYER_ATTACK_DAMAGE)
+        damageBoss(bodyHitDamage(coreExposed))
       }
     )
   }
+
+  // Breakable shoulder spikes (the hidden weakness): the center spike hides
+  // behind the head, so only the two shoulder spikes are clickable. Their
+  // hover text stays a mystery on purpose — the glint is the only clue.
+  breakableSpikes = [bossSpike2, bossSpike3].filter((e) => e !== NO_ENTITY)
+  breakableSpikes.forEach((e, i) => {
+    MeshCollider.setBox(e, ColliderLayer.CL_POINTER)
+    pointerEventsSystem.onPointerDown(
+      {
+        entity: e,
+        opts: { button: InputAction.IA_POINTER, hoverText: '???', maxDistance: 24 }
+      },
+      () => damageSpike(i)
+    )
+  })
 
   engine.addSystem(bossAnimSystem)
   engine.addSystem(fightSystem)

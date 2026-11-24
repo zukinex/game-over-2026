@@ -193,7 +193,7 @@ const bossParts = [
   { name: 'BossSpike2', pos: [-0.9, 3.5, 0.4], scale: [0.6, 0.9, 0.6], mesh: { cylinder: { radiusTop: 0.05, radiusBottom: 0.35 } }, mat: 'crystal' },
   { name: 'BossSpike3', pos: [0.9, 3.5, 0.4], scale: [0.6, 0.9, 0.6], mesh: { cylinder: { radiusTop: 0.05, radiusBottom: 0.35 } }, mat: 'crystal' },
   // Invisible click target: pointer-only collider, no renderer.
-  { name: 'BossHitbox', pos: [0, 2.2, 0], scale: [3.6, 5.2, 2.6], mesh: { box: {} }, collider: 1, hitbox: true }
+  { name: 'BossHitbox', pos: [0, 1.5, 0], scale: [3.6, 3.4, 2.6], mesh: { box: {} }, collider: 1, hitbox: true }
 ]
 
 // ------------------------------------------------------------------- build
@@ -316,7 +316,10 @@ function main() {
   // Remove previous run's entries.
   const kept = value.filter((e) => e.entity < START_ID)
   const rootEntry = kept.find((e) => e.entity === 0)
-  rootEntry.children = [...(rootEntry.children ?? []), ...childrenOfRoot]
+  // Replace (not append) the generated root children: the root entry survives
+  // the kept-filter with its previous children, so appending would duplicate
+  // them on every re-run. Keep only template children (< START_ID) here.
+  rootEntry.children = [...(rootEntry.children ?? []).filter((c) => c < START_ID), ...childrenOfRoot]
   for (const entry of kept) {
     if (entry.entity === bossRootId) entry.children = bossRootEntryChildren
   }

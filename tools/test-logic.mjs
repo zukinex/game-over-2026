@@ -43,6 +43,17 @@ assert.equal(L.scoreFor(300, 0), 1000)
 assert.equal(L.scoreFor(120, 3), 1000 + 180 * 10 + 300)
 assert.equal(L.scoreFor(400, 0), 1000) // over the limit: no time bonus
 
+assert.equal(L.bodyHitDamage(false), 10)
+assert.equal(L.bodyHitDamage(true), 20)
+
+assert.equal(L.allSpikesBroken(0), false)
+assert.equal(L.allSpikesBroken(1), false)
+assert.equal(L.allSpikesBroken(2), true)
+
+assert.equal(L.scoreFor(0, 0, 0), 1000 + 300 * 10)
+assert.equal(L.scoreFor(120, 3, 2), 1000 + 180 * 10 + 300 + 300)
+assert.equal(L.scoreFor(300, 0, 2), 1000 + 300)
+
 assert.equal(L.isTimeUp(299.9), false)
 assert.equal(L.isTimeUp(300), true)
 assert.equal(L.isTimeUp(301), true)
