@@ -1,0 +1,3911 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "name": "composite::root",
+      "jsonSchema": {
+        "type": "object",
+        "properties": {
+          "src": {
+            "type": "string",
+            "serializationType": "utf8-string"
+          },
+          "entities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "src": {
+                  "type": "integer",
+                  "serializationType": "entity"
+                },
+                "dest": {
+                  "type": "integer",
+                  "serializationType": "entity"
+                }
+              },
+              "serializationType": "map"
+            },
+            "serializationType": "array"
+          }
+        },
+        "serializationType": "map"
+      },
+      "data": {}
+    },
+    {
+      "name": "inspector::SceneMetadata",
+      "jsonSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "serializationType": "optional",
+            "optionalJsonSchema": {
+              "type": "string",
+              "serializationType": "utf8-string"
+            }
+          },
+          "description": {
+            "type": "string",
+            "serializationType": "optional",
+            "optionalJsonSchema": {
+              "type": "string",
+              "serializationType": "utf8-string"
+            }
+          },
+          "thumbnail": {
+            "type": "string",
+            "serializationType": "optional",
+            "optionalJsonSchema": {
+              "type": "string",
+              "serializationType": "utf8-string"
+            }
+          },
+          "ageRating": {
+            "type": "string",
+            "serializationType": "optional",
+            "optionalJsonSchema": {
+              "type": "string",
+              "enum": [
+                "T",
+                "A"
+              ],
+              "default": "T",
+              "serializationType": "enum-string",
+              "enumObject": {
+                "Teen": "T",
+                "Adult": "A"
+              }
+            }
+          },
+          "categories": {
+            "type": "array",
+            "serializationType": "optional",
+            "optionalJsonSchema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "art",
+                  "game",
+                  "casino",
+                  "social",
+                  "music",
+                  "fashion",
+                  "crypto",
+                  "education",
+                  "shop",
+                  "business",
+                  "sports"
+                ],
+                "default": "game",
+                "serializationType": "enum-string",
+                "enumObject": {
+                  "ART": "art",
+                  "GAME": "game",
+                  "CASINO": "casino",
+                  "SOCIAL": "social",
+                  "MUSIC": "music",
+                  "FASHION": "fashion",
+                  "CRYPTO": "crypto",
+                  "EDUCATION": "education",
+                  "SHOP": "shop",
+                  "BUSINESS": "business",
+                  "SPORTS": "sports"
+                }
+              },
+              "serializationType": "array"
+            }
+          },
+          "author": {
+            "type": "string",
+            "serializationType": "optional",
+            "optionalJsonSchema": {
+              "type": "string",
+              "serializationType": "utf8-string"
+            }
+          },
+          "email": {
+            "type": "string",
+            "serializationType": "optional",
+            "optionalJsonSchema": {
+              "type": "string",
+              "serializationType": "utf8-string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "serializationType": "optional",
+            "optionalJsonSchema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "serializationType": "utf8-string"
+              },
+              "serializationType": "array"
+            }
+          },
+          "layout": {
+            "type": "object",
+            "properties": {
+              "base": {
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "integer",
+                    "serializationType": "int32"
+                  },
+                  "y": {
+                    "type": "integer",
+                    "serializationType": "int32"
+                  }
+                },
+                "serializationType": "map"
+              },
+              "parcels": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "integer",
+                      "serializationType": "int32"
+                    },
+                    "y": {
+                      "type": "integer",
+                      "serializationType": "int32"
+                    }
+                  },
+                  "serializationType": "map"
+                },
+                "serializationType": "array"
+              }
+            },
+            "serializationType": "map"
+          },
+          "silenceVoiceChat": {
+            "type": "boolean",
+            "serializationType": "optional",
+            "optionalJsonSchema": {
+              "type": "boolean",
+              "serializationType": "boolean"
+            }
+          },
+          "disablePortableExperiences": {
+            "type": "boolean",
+            "serializationType": "optional",
+            "optionalJsonSchema": {
+              "type": "boolean",
+              "serializationType": "boolean"
+            }
+          },
+          "spawnPoints": {
+            "type": "array",
+            "serializationType": "optional",
+            "optionalJsonSchema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "serializationType": "utf8-string"
+                  },
+                  "default": {
+                    "type": "boolean",
+                    "serializationType": "optional",
+                    "optionalJsonSchema": {
+                      "type": "boolean",
+                      "serializationType": "boolean"
+                    }
+                  },
+                  "position": {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "object",
+                        "properties": {
+                          "single": {
+                            "type": "integer",
+                            "serializationType": "int32"
+                          },
+                          "range": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer",
+                              "serializationType": "int32"
+                            },
+                            "serializationType": "array"
+                          }
+                        },
+                        "serializationType": "one-of"
+                      },
+                      "y": {
+                        "type": "object",
+                        "properties": {
+                          "single": {
+                            "type": "integer",
+                            "serializationType": "int32"
+                          },
+                          "range": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer",
+                              "serializationType": "int32"
+                            },
+                            "serializationType": "array"
+                          }
+                        },
+                        "serializationType": "one-of"
+                      },
+                      "z": {
+                        "type": "object",
+                        "properties": {
+                          "single": {
+                            "type": "integer",
+                            "serializationType": "int32"
+                          },
+                          "range": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer",
+                              "serializationType": "int32"
+                            },
+                            "serializationType": "array"
+                          }
+                        },
+                        "serializationType": "one-of"
+                      }
+                    },
+                    "serializationType": "map"
+                  },
+                  "cameraTarget": {
+                    "type": "object",
+                    "serializationType": "optional",
+                    "optionalJsonSchema": {
+                      "type": "object",
+                      "properties": {
+                        "x": {
+                          "type": "integer",
+                          "serializationType": "int32"
+                        },
+                        "y": {
+                          "type": "integer",
+                          "serializationType": "int32"
+                        },
+                        "z": {
+                          "type": "integer",
+                          "serializationType": "int32"
+                        }
+                      },
+                      "serializationType": "map"
+                    }
+                  }
+                },
+                "serializationType": "map"
+              },
+              "serializationType": "array"
+            }
+          }
+        },
+        "serializationType": "map"
+      },
+      "data": {
+        "0": {
+          "json": {
+            "name": "Crystal Golem — Final Boss",
+            "description": "A 5-minute final boss fight: defeat the Crystal Golem in its arena.",
+            "thumbnail": "images/scene-thumbnail.png",
+            "categories": [
+              "game"
+            ],
+            "author": "SDK",
+            "email": "",
+            "tags": [],
+            "layout": {
+              "base": {
+                "x": 0,
+                "y": 0
+              },
+              "parcels": [
+                {
+                  "x": 0,
+                  "y": 0
+                },
+                {
+                  "x": 0,
+                  "y": 1
+                },
+                {
+                  "x": 1,
+                  "y": 0
+                },
+                {
+                  "x": 1,
+                  "y": 1
+                }
+              ]
+            },
+            "silenceVoiceChat": false,
+            "disablePortableExperiences": false,
+            "spawnPoints": [
+              {
+                "name": "spawn1",
+                "default": true,
+                "position": {
+                  "x": {
+                    "$case": "range",
+                    "value": [
+                      15,
+                      17
+                    ]
+                  },
+                  "y": {
+                    "$case": "range",
+                    "value": [
+                      0,
+                      0
+                    ]
+                  },
+                  "z": {
+                    "$case": "range",
+                    "value": [
+                      4,
+                      6
+                    ]
+                  }
+                },
+                "cameraTarget": {
+                  "x": 16,
+                  "y": 2,
+                  "z": 25
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "inspector::Nodes",
+      "jsonSchema": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "entity": {
+                  "type": "integer",
+                  "serializationType": "entity"
+                },
+                "open": {
+                  "type": "boolean",
+                  "serializationType": "optional",
+                  "optionalJsonSchema": {
+                    "type": "boolean",
+                    "serializationType": "boolean"
+                  }
+                },
+                "children": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "serializationType": "entity"
+                  },
+                  "serializationType": "array"
+                }
+              },
+              "serializationType": "map"
+            },
+            "serializationType": "array"
+          }
+        },
+        "serializationType": "map"
+      },
+      "data": {
+        "0": {
+          "json": {
+            "value": [
+              {
+                "entity": 0,
+                "open": true,
+                "children": [
+                  513,
+                  514,
+                  515,
+                  516,
+                  517,
+                  518,
+                  519,
+                  520,
+                  521,
+                  522,
+                  523,
+                  524,
+                  525,
+                  526,
+                  527,
+                  528,
+                  529,
+                  530,
+                  531,
+                  532,
+                  533,
+                  534,
+                  535,
+                  536,
+                  537,
+                  538,
+                  539,
+                  540,
+                  541,
+                  542,
+                  543,
+                  544,
+                  545,
+                  546,
+                  547,
+                  548
+                ]
+              },
+              {
+                "entity": 1,
+                "children": []
+              },
+              {
+                "entity": 2,
+                "children": []
+              },
+              {
+                "entity": 513,
+                "children": []
+              },
+              {
+                "entity": 514,
+                "children": []
+              },
+              {
+                "entity": 515,
+                "children": []
+              },
+              {
+                "entity": 516,
+                "children": []
+              },
+              {
+                "entity": 517,
+                "children": []
+              },
+              {
+                "entity": 518,
+                "children": []
+              },
+              {
+                "entity": 519,
+                "children": []
+              },
+              {
+                "entity": 520,
+                "children": []
+              },
+              {
+                "entity": 521,
+                "children": []
+              },
+              {
+                "entity": 522,
+                "children": []
+              },
+              {
+                "entity": 523,
+                "children": []
+              },
+              {
+                "entity": 524,
+                "children": []
+              },
+              {
+                "entity": 525,
+                "children": []
+              },
+              {
+                "entity": 526,
+                "children": []
+              },
+              {
+                "entity": 527,
+                "children": []
+              },
+              {
+                "entity": 528,
+                "children": []
+              },
+              {
+                "entity": 529,
+                "children": []
+              },
+              {
+                "entity": 530,
+                "children": []
+              },
+              {
+                "entity": 531,
+                "children": []
+              },
+              {
+                "entity": 532,
+                "children": []
+              },
+              {
+                "entity": 533,
+                "children": []
+              },
+              {
+                "entity": 534,
+                "children": []
+              },
+              {
+                "entity": 535,
+                "children": []
+              },
+              {
+                "entity": 536,
+                "children": []
+              },
+              {
+                "entity": 537,
+                "children": []
+              },
+              {
+                "entity": 538,
+                "children": []
+              },
+              {
+                "entity": 539,
+                "children": []
+              },
+              {
+                "entity": 540,
+                "children": []
+              },
+              {
+                "entity": 541,
+                "children": []
+              },
+              {
+                "entity": 542,
+                "children": []
+              },
+              {
+                "entity": 543,
+                "children": []
+              },
+              {
+                "entity": 544,
+                "children": []
+              },
+              {
+                "entity": 545,
+                "children": []
+              },
+              {
+                "entity": 546,
+                "children": []
+              },
+              {
+                "entity": 547,
+                "children": []
+              },
+              {
+                "entity": 548,
+                "children": [
+                  549,
+                  550,
+                  551,
+                  552,
+                  553,
+                  554,
+                  555,
+                  556,
+                  557,
+                  558,
+                  559,
+                  560,
+                  561
+                ]
+              },
+              {
+                "entity": 549,
+                "children": []
+              },
+              {
+                "entity": 550,
+                "children": []
+              },
+              {
+                "entity": 551,
+                "children": []
+              },
+              {
+                "entity": 552,
+                "children": []
+              },
+              {
+                "entity": 553,
+                "children": []
+              },
+              {
+                "entity": 554,
+                "children": [
+                  562
+                ]
+              },
+              {
+                "entity": 555,
+                "children": [
+                  563
+                ]
+              },
+              {
+                "entity": 556,
+                "children": []
+              },
+              {
+                "entity": 557,
+                "children": []
+              },
+              {
+                "entity": 558,
+                "children": []
+              },
+              {
+                "entity": 559,
+                "children": []
+              },
+              {
+                "entity": 560,
+                "children": []
+              },
+              {
+                "entity": 561,
+                "children": []
+              },
+              {
+                "entity": 562,
+                "children": []
+              },
+              {
+                "entity": 563,
+                "children": []
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "asset-packs::ActionTypes",
+      "jsonSchema": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "serializationType": "utf8-string"
+                },
+                "jsonSchema": {
+                  "type": "string",
+                  "serializationType": "utf8-string"
+                }
+              },
+              "serializationType": "map"
+            },
+            "serializationType": "array"
+          }
+        },
+        "serializationType": "map"
+      },
+      "data": {
+        "0": {
+          "json": {
+            "value": [
+              {
+                "type": "play_animation",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"animation\":{\"type\":\"string\",\"serializationType\":\"utf8-string\"},\"loop\":{\"type\":\"boolean\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"boolean\",\"serializationType\":\"boolean\"}}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "stop_animation",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "set_state",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"state\":{\"type\":\"string\",\"serializationType\":\"utf8-string\"}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "start_tween",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"type\":{\"type\":\"string\",\"enum\":[\"move_item\",\"rotate_item\",\"scale_item\"],\"default\":\"move_item\",\"serializationType\":\"enum-string\",\"enumObject\":{\"MOVE_ITEM\":\"move_item\",\"ROTATE_ITEM\":\"rotate_item\",\"SCALE_ITEM\":\"scale_item\"}},\"end\":{\"type\":\"object\",\"properties\":{\"x\":{\"type\":\"number\"},\"y\":{\"type\":\"number\"},\"z\":{\"type\":\"number\"},\"w\":{\"type\":\"number\"}},\"serializationType\":\"vector3\"},\"interpolationType\":{\"type\":\"string\",\"enum\":[\"linear\",\"easeinquad\",\"easeoutquad\",\"easequad\",\"easeinsine\",\"easeoutsine\",\"easeinoutsine\",\"easeinexpo\",\"easeoutexpo\",\"easeinoutexpo\",\"easeinelastic\",\"easeoutelastic\",\"easeinoutelastic\",\"easeinbounce\",\"easeoutbounce\",\"easeinoutbounce\"],\"default\":\"linear\",\"serializationType\":\"enum-string\",\"enumObject\":{\"LINEAR\":\"linear\",\"EASEINQUAD\":\"easeinquad\",\"EASEOUTQUAD\":\"easeoutquad\",\"EASEQUAD\":\"easequad\",\"EASEINSINE\":\"easeinsine\",\"EASEOUTSINE\":\"easeoutsine\",\"EASESINE\":\"easeinoutsine\",\"EASEINEXPO\":\"easeinexpo\",\"EASEOUTEXPO\":\"easeoutexpo\",\"EASEEXPO\":\"easeinoutexpo\",\"EASEINELASTIC\":\"easeinelastic\",\"EASEOUTELASTIC\":\"easeoutelastic\",\"EASEELASTIC\":\"easeinoutelastic\",\"EASEINBOUNCE\":\"easeinbounce\",\"EASEOUTEBOUNCE\":\"easeoutbounce\",\"EASEBOUNCE\":\"easeinoutbounce\"}},\"duration\":{\"type\":\"number\",\"serializationType\":\"float32\"},\"relative\":{\"type\":\"boolean\",\"serializationType\":\"boolean\"}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "set_counter",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"counter\":{\"type\":\"integer\",\"serializationType\":\"int32\"}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "increment_counter",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"amount\":{\"type\":\"integer\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"integer\",\"serializationType\":\"int32\"}}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "decrease_counter",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"amount\":{\"type\":\"integer\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"integer\",\"serializationType\":\"int32\"}}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "play_sound",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"src\":{\"type\":\"string\",\"serializationType\":\"utf8-string\"},\"loop\":{\"type\":\"boolean\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"boolean\",\"serializationType\":\"boolean\"}},\"volume\":{\"type\":\"number\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"number\",\"serializationType\":\"float32\"}}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "stop_sound",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "set_visibility",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"visible\":{\"type\":\"boolean\",\"serializationType\":\"boolean\"},\"physicsCollider\":{\"type\":\"boolean\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"boolean\",\"serializationType\":\"boolean\"}},\"collider\":{\"type\":\"integer\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"integer\",\"enum\":[0,1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768],\"default\":1,\"serializationType\":\"enum-int\",\"enumObject\":{\"0\":\"CL_NONE\",\"1\":\"CL_POINTER\",\"2\":\"CL_PHYSICS\",\"4\":\"CL_RESERVED1\",\"8\":\"CL_RESERVED2\",\"16\":\"CL_RESERVED3\",\"32\":\"CL_RESERVED4\",\"64\":\"CL_RESERVED5\",\"128\":\"CL_RESERVED6\",\"256\":\"CL_CUSTOM1\",\"512\":\"CL_CUSTOM2\",\"1024\":\"CL_CUSTOM3\",\"2048\":\"CL_CUSTOM4\",\"4096\":\"CL_CUSTOM5\",\"8192\":\"CL_CUSTOM6\",\"16384\":\"CL_CUSTOM7\",\"32768\":\"CL_CUSTOM8\",\"CL_NONE\":0,\"CL_POINTER\":1,\"CL_PHYSICS\":2,\"CL_RESERVED1\":4,\"CL_RESERVED2\":8,\"CL_RESERVED3\":16,\"CL_RESERVED4\":32,\"CL_RESERVED5\":64,\"CL_RESERVED6\":128,\"CL_CUSTOM1\":256,\"CL_CUSTOM2\":512,\"CL_CUSTOM3\":1024,\"CL_CUSTOM4\":2048,\"CL_CUSTOM5\":4096,\"CL_CUSTOM6\":8192,\"CL_CUSTOM7\":16384,\"CL_CUSTOM8\":32768}}}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "attach_to_player",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"anchorPointId\":{\"type\":\"integer\",\"serializationType\":\"int32\"}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "detach_from_player",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "play_video_stream",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"src\":{\"type\":\"string\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"string\",\"serializationType\":\"utf8-string\"}},\"loop\":{\"type\":\"boolean\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"boolean\",\"serializationType\":\"boolean\"}},\"volume\":{\"type\":\"number\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"number\",\"serializationType\":\"float32\"}},\"dclCast\":{\"type\":\"boolean\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"boolean\",\"serializationType\":\"boolean\"}}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "stop_video_stream",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "play_audio_stream",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"url\":{\"type\":\"string\",\"serializationType\":\"utf8-string\"},\"volume\":{\"type\":\"number\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"number\",\"serializationType\":\"float32\"}}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "stop_audio_stream",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "teleport_player",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"x\":{\"type\":\"integer\",\"serializationType\":\"int32\"},\"y\":{\"type\":\"integer\",\"serializationType\":\"int32\"}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "move_player",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"position\":{\"type\":\"object\",\"properties\":{\"x\":{\"type\":\"number\"},\"y\":{\"type\":\"number\"},\"z\":{\"type\":\"number\"},\"w\":{\"type\":\"number\"}},\"serializationType\":\"vector3\"},\"cameraTarget\":{\"type\":\"object\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"object\",\"properties\":{\"x\":{\"type\":\"number\"},\"y\":{\"type\":\"number\"},\"z\":{\"type\":\"number\"},\"w\":{\"type\":\"number\"}},\"serializationType\":\"vector3\"}}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "play_default_emote",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"emote\":{\"type\":\"string\",\"serializationType\":\"utf8-string\"}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "play_custom_emote",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"src\":{\"type\":\"string\",\"serializationType\":\"utf8-string\"},\"loop\":{\"type\":\"boolean\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"boolean\",\"serializationType\":\"boolean\"}}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "open_link",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"url\":{\"type\":\"string\",\"serializationType\":\"utf8-string\"}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "show_text",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"text\":{\"type\":\"string\",\"serializationType\":\"utf8-string\"},\"hideAfterSeconds\":{\"type\":\"number\",\"serializationType\":\"float32\"},\"font\":{\"type\":\"integer\",\"enum\":[0,1,2],\"default\":0,\"serializationType\":\"enum-int\",\"enumObject\":{\"0\":\"F_SANS_SERIF\",\"1\":\"F_SERIF\",\"2\":\"F_MONOSPACE\",\"F_SANS_SERIF\":0,\"F_SERIF\":1,\"F_MONOSPACE\":2}},\"fontSize\":{\"type\":\"number\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"number\",\"serializationType\":\"float32\"}},\"textAlign\":{\"type\":\"integer\",\"enum\":[0,1,2,3,4,5,6,7,8],\"default\":4,\"serializationType\":\"enum-int\",\"enumObject\":{\"0\":\"TAM_TOP_LEFT\",\"1\":\"TAM_TOP_CENTER\",\"2\":\"TAM_TOP_RIGHT\",\"3\":\"TAM_MIDDLE_LEFT\",\"4\":\"TAM_MIDDLE_CENTER\",\"5\":\"TAM_MIDDLE_RIGHT\",\"6\":\"TAM_BOTTOM_LEFT\",\"7\":\"TAM_BOTTOM_CENTER\",\"8\":\"TAM_BOTTOM_RIGHT\",\"TAM_TOP_LEFT\":0,\"TAM_TOP_CENTER\":1,\"TAM_TOP_RIGHT\":2,\"TAM_MIDDLE_LEFT\":3,\"TAM_MIDDLE_CENTER\":4,\"TAM_MIDDLE_RIGHT\":5,\"TAM_BOTTOM_LEFT\":6,\"TAM_BOTTOM_CENTER\":7,\"TAM_BOTTOM_RIGHT\":8}}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "hide_text",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "start_delay",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"actions\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"serializationType\":\"utf8-string\"},\"serializationType\":\"array\"},\"timeout\":{\"type\":\"number\",\"serializationType\":\"float32\"}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "stop_delay",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"action\":{\"type\":\"string\",\"serializationType\":\"utf8-string\"}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "start_loop",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"actions\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"serializationType\":\"utf8-string\"},\"serializationType\":\"array\"},\"interval\":{\"type\":\"number\",\"serializationType\":\"float32\"}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "stop_loop",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"action\":{\"type\":\"string\",\"serializationType\":\"utf8-string\"}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "clone_entity",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"position\":{\"type\":\"object\",\"properties\":{\"x\":{\"type\":\"number\"},\"y\":{\"type\":\"number\"},\"z\":{\"type\":\"number\"},\"w\":{\"type\":\"number\"}},\"serializationType\":\"vector3\"}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "remove_entity",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "show_image",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"src\":{\"type\":\"string\",\"serializationType\":\"utf8-string\"},\"align\":{\"type\":\"integer\",\"enum\":[0,1,2,3,4,5,6,7,8],\"default\":4,\"serializationType\":\"enum-int\",\"enumObject\":{\"0\":\"TAM_TOP_LEFT\",\"1\":\"TAM_TOP_CENTER\",\"2\":\"TAM_TOP_RIGHT\",\"3\":\"TAM_MIDDLE_LEFT\",\"4\":\"TAM_MIDDLE_CENTER\",\"5\":\"TAM_MIDDLE_RIGHT\",\"6\":\"TAM_BOTTOM_LEFT\",\"7\":\"TAM_BOTTOM_CENTER\",\"8\":\"TAM_BOTTOM_RIGHT\",\"TAM_TOP_LEFT\":0,\"TAM_TOP_CENTER\":1,\"TAM_TOP_RIGHT\":2,\"TAM_MIDDLE_LEFT\":3,\"TAM_MIDDLE_CENTER\":4,\"TAM_MIDDLE_RIGHT\":5,\"TAM_BOTTOM_LEFT\":6,\"TAM_BOTTOM_CENTER\":7,\"TAM_BOTTOM_RIGHT\":8}},\"height\":{\"type\":\"number\",\"serializationType\":\"float32\"},\"width\":{\"type\":\"number\",\"serializationType\":\"float32\"},\"hideAfterSeconds\":{\"type\":\"number\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"number\",\"serializationType\":\"float32\"}},\"text\":{\"type\":\"string\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"string\",\"serializationType\":\"utf8-string\"}},\"fontSize\":{\"type\":\"number\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"number\",\"serializationType\":\"float32\"}}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "hide_image",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"imageEntity\":{\"type\":\"integer\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"integer\",\"serializationType\":\"int32\"}}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "damage",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"radius\":{\"type\":\"number\",\"serializationType\":\"float32\"},\"layer\":{\"type\":\"string\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"string\",\"enum\":[\"all\",\"player\",\"non_player\"],\"default\":\"all\",\"serializationType\":\"enum-string\",\"enumObject\":{\"ALL\":\"all\",\"PLAYER\":\"player\",\"NON_PLAYER\":\"non_player\"}}},\"hits\":{\"type\":\"integer\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"integer\",\"serializationType\":\"int32\"}}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "move_player_here",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "place_on_player",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "rotate_as_player",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "place_on_camera",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "rotate_as_camera",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "set_position",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"x\":{\"type\":\"number\",\"serializationType\":\"float32\"},\"y\":{\"type\":\"number\",\"serializationType\":\"float32\"},\"z\":{\"type\":\"number\",\"serializationType\":\"float32\"},\"relative\":{\"type\":\"boolean\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"boolean\",\"serializationType\":\"boolean\"}}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "set_rotation",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"x\":{\"type\":\"number\",\"serializationType\":\"float32\"},\"y\":{\"type\":\"number\",\"serializationType\":\"float32\"},\"z\":{\"type\":\"number\",\"serializationType\":\"float32\"},\"relative\":{\"type\":\"boolean\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"boolean\",\"serializationType\":\"boolean\"}}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "set_scale",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"x\":{\"type\":\"number\",\"serializationType\":\"float32\"},\"y\":{\"type\":\"number\",\"serializationType\":\"float32\"},\"z\":{\"type\":\"number\",\"serializationType\":\"float32\"},\"relative\":{\"type\":\"boolean\",\"serializationType\":\"optional\",\"optionalJsonSchema\":{\"type\":\"boolean\",\"serializationType\":\"boolean\"}}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "follow_player",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"speed\":{\"type\":\"number\",\"serializationType\":\"float32\"},\"x\":{\"type\":\"boolean\",\"serializationType\":\"boolean\"},\"y\":{\"type\":\"boolean\",\"serializationType\":\"boolean\"},\"z\":{\"type\":\"boolean\",\"serializationType\":\"boolean\"},\"minDistance\":{\"type\":\"number\",\"serializationType\":\"float32\"}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "stop_following_player",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "random",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"actions\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"serializationType\":\"utf8-string\"},\"serializationType\":\"array\"}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "batch",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"actions\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"serializationType\":\"utf8-string\"},\"serializationType\":\"array\"}},\"serializationType\":\"map\"}"
+              },
+              {
+                "type": "heal_player",
+                "jsonSchema": "{\"type\":\"object\",\"properties\":{\"multiplier\":{\"type\":\"integer\",\"serializationType\":\"int32\"}},\"serializationType\":\"map\"}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "asset-packs::Counter",
+      "jsonSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "serializationType": "float32"
+          },
+          "value": {
+            "type": "integer",
+            "serializationType": "int32"
+          }
+        },
+        "serializationType": "map"
+      },
+      "data": {
+        "0": {
+          "json": {
+            "id": 0,
+            "value": 0
+          }
+        }
+      }
+    },
+    {
+      "name": "core-schema::Name",
+      "data": {
+        "513": {
+          "json": {
+            "value": "ArenaFloor"
+          }
+        },
+        "514": {
+          "json": {
+            "value": "Wall01"
+          }
+        },
+        "515": {
+          "json": {
+            "value": "Wall02"
+          }
+        },
+        "516": {
+          "json": {
+            "value": "Wall03"
+          }
+        },
+        "517": {
+          "json": {
+            "value": "Wall04"
+          }
+        },
+        "518": {
+          "json": {
+            "value": "Wall05"
+          }
+        },
+        "519": {
+          "json": {
+            "value": "Wall06"
+          }
+        },
+        "520": {
+          "json": {
+            "value": "Wall07"
+          }
+        },
+        "521": {
+          "json": {
+            "value": "Wall08"
+          }
+        },
+        "522": {
+          "json": {
+            "value": "Wall09"
+          }
+        },
+        "523": {
+          "json": {
+            "value": "Wall10"
+          }
+        },
+        "524": {
+          "json": {
+            "value": "Wall11"
+          }
+        },
+        "525": {
+          "json": {
+            "value": "Wall12"
+          }
+        },
+        "526": {
+          "json": {
+            "value": "Pillar1"
+          }
+        },
+        "527": {
+          "json": {
+            "value": "Pillar2"
+          }
+        },
+        "528": {
+          "json": {
+            "value": "Pillar3"
+          }
+        },
+        "529": {
+          "json": {
+            "value": "Pillar4"
+          }
+        },
+        "530": {
+          "json": {
+            "value": "TorchPole1"
+          }
+        },
+        "531": {
+          "json": {
+            "value": "TorchFlame1"
+          }
+        },
+        "532": {
+          "json": {
+            "value": "TorchPole2"
+          }
+        },
+        "533": {
+          "json": {
+            "value": "TorchFlame2"
+          }
+        },
+        "534": {
+          "json": {
+            "value": "TorchPole3"
+          }
+        },
+        "535": {
+          "json": {
+            "value": "TorchFlame3"
+          }
+        },
+        "536": {
+          "json": {
+            "value": "TorchPole4"
+          }
+        },
+        "537": {
+          "json": {
+            "value": "TorchFlame4"
+          }
+        },
+        "538": {
+          "json": {
+            "value": "Crystal1"
+          }
+        },
+        "539": {
+          "json": {
+            "value": "Crystal2"
+          }
+        },
+        "540": {
+          "json": {
+            "value": "Crystal3"
+          }
+        },
+        "541": {
+          "json": {
+            "value": "Crystal4"
+          }
+        },
+        "542": {
+          "json": {
+            "value": "Crystal5"
+          }
+        },
+        "543": {
+          "json": {
+            "value": "Crystal6"
+          }
+        },
+        "544": {
+          "json": {
+            "value": "Crystal7"
+          }
+        },
+        "545": {
+          "json": {
+            "value": "Crystal8"
+          }
+        },
+        "546": {
+          "json": {
+            "value": "SignTitle"
+          }
+        },
+        "547": {
+          "json": {
+            "value": "SignHint"
+          }
+        },
+        "548": {
+          "json": {
+            "value": "BossRoot"
+          }
+        },
+        "549": {
+          "json": {
+            "value": "BossTorso"
+          }
+        },
+        "550": {
+          "json": {
+            "value": "BossChestCore"
+          }
+        },
+        "551": {
+          "json": {
+            "value": "BossHead"
+          }
+        },
+        "552": {
+          "json": {
+            "value": "BossEyeL"
+          }
+        },
+        "553": {
+          "json": {
+            "value": "BossEyeR"
+          }
+        },
+        "554": {
+          "json": {
+            "value": "BossArmPivotL"
+          }
+        },
+        "555": {
+          "json": {
+            "value": "BossArmPivotR"
+          }
+        },
+        "556": {
+          "json": {
+            "value": "BossLegL"
+          }
+        },
+        "557": {
+          "json": {
+            "value": "BossLegR"
+          }
+        },
+        "558": {
+          "json": {
+            "value": "BossSpike1"
+          }
+        },
+        "559": {
+          "json": {
+            "value": "BossSpike2"
+          }
+        },
+        "560": {
+          "json": {
+            "value": "BossSpike3"
+          }
+        },
+        "561": {
+          "json": {
+            "value": "BossHitbox"
+          }
+        },
+        "562": {
+          "json": {
+            "value": "BossArmL"
+          }
+        },
+        "563": {
+          "json": {
+            "value": "BossArmR"
+          }
+        }
+      },
+      "jsonSchema": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "serializationType": "utf8-string"
+          }
+        },
+        "serializationType": "map"
+      }
+    },
+    {
+      "name": "core::Transform",
+      "data": {
+        "513": {
+          "json": {
+            "position": {
+              "x": 16,
+              "y": 0.1,
+              "z": 16
+            },
+            "scale": {
+              "x": 1,
+              "y": 0.2,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "514": {
+          "json": {
+            "position": {
+              "x": 16,
+              "y": 1.5,
+              "z": 29.5
+            },
+            "scale": {
+              "x": 4.6,
+              "y": 3,
+              "z": 0.5
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "515": {
+          "json": {
+            "position": {
+              "x": 22.75,
+              "y": 1.5,
+              "z": 27.691342951089922
+            },
+            "scale": {
+              "x": 4.6,
+              "y": 3,
+              "z": 0.5
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0.25881904510252074,
+              "z": 0,
+              "w": 0.9659258262890683
+            },
+            "parent": 0
+          }
+        },
+        "516": {
+          "json": {
+            "position": {
+              "x": 27.691342951089922,
+              "y": 1.5,
+              "z": 22.75
+            },
+            "scale": {
+              "x": 4.6,
+              "y": 3,
+              "z": 0.5
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0.49999999999999994,
+              "z": 0,
+              "w": 0.8660254037844387
+            },
+            "parent": 0
+          }
+        },
+        "517": {
+          "json": {
+            "position": {
+              "x": 29.5,
+              "y": 1.5,
+              "z": 16
+            },
+            "scale": {
+              "x": 4.6,
+              "y": 3,
+              "z": 0.5
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0.7071067811865475,
+              "z": 0,
+              "w": 0.7071067811865476
+            },
+            "parent": 0
+          }
+        },
+        "518": {
+          "json": {
+            "position": {
+              "x": 27.691342951089922,
+              "y": 1.5,
+              "z": 9.250000000000004
+            },
+            "scale": {
+              "x": 4.6,
+              "y": 3,
+              "z": 0.5
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0.8660254037844386,
+              "z": 0,
+              "w": 0.5000000000000001
+            },
+            "parent": 0
+          }
+        },
+        "519": {
+          "json": {
+            "position": {
+              "x": 22.75,
+              "y": 1.5,
+              "z": 4.308657048910078
+            },
+            "scale": {
+              "x": 4.6,
+              "y": 3,
+              "z": 0.5
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0.9659258262890683,
+              "z": 0,
+              "w": 0.25881904510252074
+            },
+            "parent": 0
+          }
+        },
+        "520": {
+          "json": {
+            "position": {
+              "x": 16,
+              "y": 1.5,
+              "z": 2.5
+            },
+            "scale": {
+              "x": 4.6,
+              "y": 3,
+              "z": 0.5
+            },
+            "rotation": {
+              "x": 0,
+              "y": 1,
+              "z": 0,
+              "w": 6.123233995736766e-17
+            },
+            "parent": 0
+          }
+        },
+        "521": {
+          "json": {
+            "position": {
+              "x": 9.249999999999998,
+              "y": 1.5,
+              "z": 4.30865704891008
+            },
+            "scale": {
+              "x": 4.6,
+              "y": 3,
+              "z": 0.5
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0.9659258262890683,
+              "z": 0,
+              "w": -0.25881904510252085
+            },
+            "parent": 0
+          }
+        },
+        "522": {
+          "json": {
+            "position": {
+              "x": 4.30865704891008,
+              "y": 1.5,
+              "z": 9.249999999999993
+            },
+            "scale": {
+              "x": 4.6,
+              "y": 3,
+              "z": 0.5
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0.8660254037844387,
+              "z": 0,
+              "w": -0.4999999999999998
+            },
+            "parent": 0
+          }
+        },
+        "523": {
+          "json": {
+            "position": {
+              "x": 2.5,
+              "y": 1.5,
+              "z": 15.999999999999998
+            },
+            "scale": {
+              "x": 4.6,
+              "y": 3,
+              "z": 0.5
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0.7071067811865476,
+              "z": 0,
+              "w": -0.7071067811865475
+            },
+            "parent": 0
+          }
+        },
+        "524": {
+          "json": {
+            "position": {
+              "x": 4.30865704891008,
+              "y": 1.5,
+              "z": 22.75
+            },
+            "scale": {
+              "x": 4.6,
+              "y": 3,
+              "z": 0.5
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0.49999999999999994,
+              "z": 0,
+              "w": -0.8660254037844387
+            },
+            "parent": 0
+          }
+        },
+        "525": {
+          "json": {
+            "position": {
+              "x": 9.249999999999993,
+              "y": 1.5,
+              "z": 27.69134295108992
+            },
+            "scale": {
+              "x": 4.6,
+              "y": 3,
+              "z": 0.5
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0.258819045102521,
+              "z": 0,
+              "w": -0.9659258262890682
+            },
+            "parent": 0
+          }
+        },
+        "526": {
+          "json": {
+            "position": {
+              "x": 7,
+              "y": 2.5,
+              "z": 7
+            },
+            "scale": {
+              "x": 1,
+              "y": 5,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "527": {
+          "json": {
+            "position": {
+              "x": 25,
+              "y": 2.5,
+              "z": 7
+            },
+            "scale": {
+              "x": 1,
+              "y": 5,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "528": {
+          "json": {
+            "position": {
+              "x": 7,
+              "y": 2.5,
+              "z": 25
+            },
+            "scale": {
+              "x": 1,
+              "y": 5,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "529": {
+          "json": {
+            "position": {
+              "x": 25,
+              "y": 2.5,
+              "z": 25
+            },
+            "scale": {
+              "x": 1,
+              "y": 5,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "530": {
+          "json": {
+            "position": {
+              "x": 10.5,
+              "y": 1.1,
+              "z": 10.5
+            },
+            "scale": {
+              "x": 1,
+              "y": 2.2,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "531": {
+          "json": {
+            "position": {
+              "x": 10.5,
+              "y": 2.5,
+              "z": 10.5
+            },
+            "scale": {
+              "x": 0.7,
+              "y": 0.7,
+              "z": 0.7
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "532": {
+          "json": {
+            "position": {
+              "x": 21.5,
+              "y": 1.1,
+              "z": 10.5
+            },
+            "scale": {
+              "x": 1,
+              "y": 2.2,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "533": {
+          "json": {
+            "position": {
+              "x": 21.5,
+              "y": 2.5,
+              "z": 10.5
+            },
+            "scale": {
+              "x": 0.7,
+              "y": 0.7,
+              "z": 0.7
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "534": {
+          "json": {
+            "position": {
+              "x": 10.5,
+              "y": 1.1,
+              "z": 21.5
+            },
+            "scale": {
+              "x": 1,
+              "y": 2.2,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "535": {
+          "json": {
+            "position": {
+              "x": 10.5,
+              "y": 2.5,
+              "z": 21.5
+            },
+            "scale": {
+              "x": 0.7,
+              "y": 0.7,
+              "z": 0.7
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "536": {
+          "json": {
+            "position": {
+              "x": 21.5,
+              "y": 1.1,
+              "z": 21.5
+            },
+            "scale": {
+              "x": 1,
+              "y": 2.2,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "537": {
+          "json": {
+            "position": {
+              "x": 21.5,
+              "y": 2.5,
+              "z": 21.5
+            },
+            "scale": {
+              "x": 0.7,
+              "y": 0.7,
+              "z": 0.7
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "538": {
+          "json": {
+            "position": {
+              "x": 20.209517756015988,
+              "y": 0.45,
+              "z": 26.162674857624154
+            },
+            "scale": {
+              "x": 1,
+              "y": 0.9,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "539": {
+          "json": {
+            "position": {
+              "x": 26.162674857624154,
+              "y": 0.65,
+              "z": 20.209517756015988
+            },
+            "scale": {
+              "x": 1,
+              "y": 1.3,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "540": {
+          "json": {
+            "position": {
+              "x": 26.162674857624154,
+              "y": 0.8,
+              "z": 11.790482243984012
+            },
+            "scale": {
+              "x": 1,
+              "y": 1.6,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "541": {
+          "json": {
+            "position": {
+              "x": 20.209517756015988,
+              "y": 0.55,
+              "z": 5.837325142375846
+            },
+            "scale": {
+              "x": 1,
+              "y": 1.1,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "542": {
+          "json": {
+            "position": {
+              "x": 11.79048224398402,
+              "y": 0.7,
+              "z": 5.8373251423758425
+            },
+            "scale": {
+              "x": 1,
+              "y": 1.4,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "543": {
+          "json": {
+            "position": {
+              "x": 5.837325142375844,
+              "y": 0.5,
+              "z": 11.790482243984016
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "544": {
+          "json": {
+            "position": {
+              "x": 5.837325142375848,
+              "y": 0.75,
+              "z": 20.20951775601599
+            },
+            "scale": {
+              "x": 1,
+              "y": 1.5,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "545": {
+          "json": {
+            "position": {
+              "x": 11.790482243984016,
+              "y": 0.6,
+              "z": 26.162674857624154
+            },
+            "scale": {
+              "x": 1,
+              "y": 1.2,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "546": {
+          "json": {
+            "position": {
+              "x": 16,
+              "y": 2.4,
+              "z": 5.5
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "547": {
+          "json": {
+            "position": {
+              "x": 16,
+              "y": 1.7,
+              "z": 5.5
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "548": {
+          "json": {
+            "position": {
+              "x": 16,
+              "y": 0,
+              "z": 25
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 0
+          }
+        },
+        "549": {
+          "json": {
+            "position": {
+              "x": 0,
+              "y": 2.2,
+              "z": 0
+            },
+            "scale": {
+              "x": 2.6,
+              "y": 2.6,
+              "z": 1.6
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 548
+          }
+        },
+        "550": {
+          "json": {
+            "position": {
+              "x": 0,
+              "y": 2.4,
+              "z": -0.85
+            },
+            "scale": {
+              "x": 0.9,
+              "y": 0.9,
+              "z": 0.3
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0.3826834323650898,
+              "w": 0.9238795325112867
+            },
+            "parent": 548
+          }
+        },
+        "551": {
+          "json": {
+            "position": {
+              "x": 0,
+              "y": 4.1,
+              "z": 0
+            },
+            "scale": {
+              "x": 1.3,
+              "y": 1.1,
+              "z": 1.2
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 548
+          }
+        },
+        "552": {
+          "json": {
+            "position": {
+              "x": -0.35,
+              "y": 4.2,
+              "z": -0.62
+            },
+            "scale": {
+              "x": 0.25,
+              "y": 0.15,
+              "z": 0.1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 548
+          }
+        },
+        "553": {
+          "json": {
+            "position": {
+              "x": 0.35,
+              "y": 4.2,
+              "z": -0.62
+            },
+            "scale": {
+              "x": 0.25,
+              "y": 0.15,
+              "z": 0.1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 548
+          }
+        },
+        "554": {
+          "json": {
+            "position": {
+              "x": -1.5,
+              "y": 3.3,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 548
+          }
+        },
+        "555": {
+          "json": {
+            "position": {
+              "x": 1.5,
+              "y": 3.3,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 548
+          }
+        },
+        "556": {
+          "json": {
+            "position": {
+              "x": -0.7,
+              "y": 0.6,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1.2,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 548
+          }
+        },
+        "557": {
+          "json": {
+            "position": {
+              "x": 0.7,
+              "y": 0.6,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1.2,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 548
+          }
+        },
+        "558": {
+          "json": {
+            "position": {
+              "x": 0,
+              "y": 3.9,
+              "z": 0.5
+            },
+            "scale": {
+              "x": 1,
+              "y": 1.2,
+              "z": 1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 548
+          }
+        },
+        "559": {
+          "json": {
+            "position": {
+              "x": -0.9,
+              "y": 3.5,
+              "z": 0.4
+            },
+            "scale": {
+              "x": 0.6,
+              "y": 0.9,
+              "z": 0.6
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 548
+          }
+        },
+        "560": {
+          "json": {
+            "position": {
+              "x": 0.9,
+              "y": 3.5,
+              "z": 0.4
+            },
+            "scale": {
+              "x": 0.6,
+              "y": 0.9,
+              "z": 0.6
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 548
+          }
+        },
+        "561": {
+          "json": {
+            "position": {
+              "x": 0,
+              "y": 2.2,
+              "z": 0
+            },
+            "scale": {
+              "x": 3.6,
+              "y": 5.2,
+              "z": 2.6
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 548
+          }
+        },
+        "562": {
+          "json": {
+            "position": {
+              "x": 0,
+              "y": -1,
+              "z": 0
+            },
+            "scale": {
+              "x": 0.8,
+              "y": 2.4,
+              "z": 0.8
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 554
+          }
+        },
+        "563": {
+          "json": {
+            "position": {
+              "x": 0,
+              "y": -1,
+              "z": 0
+            },
+            "scale": {
+              "x": 0.8,
+              "y": 2.4,
+              "z": 0.8
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+              "w": 1
+            },
+            "parent": 555
+          }
+        }
+      }
+    },
+    {
+      "name": "core::MeshRenderer",
+      "data": {
+        "513": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 13.5,
+                "radiusBottom": 13.5
+              }
+            }
+          }
+        },
+        "514": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "515": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "516": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "517": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "518": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "519": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "520": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "521": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "522": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "523": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "524": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "525": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "526": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.7,
+                "radiusBottom": 0.7
+              }
+            }
+          }
+        },
+        "527": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.7,
+                "radiusBottom": 0.7
+              }
+            }
+          }
+        },
+        "528": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.7,
+                "radiusBottom": 0.7
+              }
+            }
+          }
+        },
+        "529": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.7,
+                "radiusBottom": 0.7
+              }
+            }
+          }
+        },
+        "530": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.12,
+                "radiusBottom": 0.12
+              }
+            }
+          }
+        },
+        "531": {
+          "json": {
+            "mesh": {
+              "$case": "sphere",
+              "sphere": {}
+            }
+          }
+        },
+        "532": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.12,
+                "radiusBottom": 0.12
+              }
+            }
+          }
+        },
+        "533": {
+          "json": {
+            "mesh": {
+              "$case": "sphere",
+              "sphere": {}
+            }
+          }
+        },
+        "534": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.12,
+                "radiusBottom": 0.12
+              }
+            }
+          }
+        },
+        "535": {
+          "json": {
+            "mesh": {
+              "$case": "sphere",
+              "sphere": {}
+            }
+          }
+        },
+        "536": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.12,
+                "radiusBottom": 0.12
+              }
+            }
+          }
+        },
+        "537": {
+          "json": {
+            "mesh": {
+              "$case": "sphere",
+              "sphere": {}
+            }
+          }
+        },
+        "538": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.05,
+                "radiusBottom": 0.4
+              }
+            }
+          }
+        },
+        "539": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.05,
+                "radiusBottom": 0.4
+              }
+            }
+          }
+        },
+        "540": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.05,
+                "radiusBottom": 0.4
+              }
+            }
+          }
+        },
+        "541": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.05,
+                "radiusBottom": 0.4
+              }
+            }
+          }
+        },
+        "542": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.05,
+                "radiusBottom": 0.4
+              }
+            }
+          }
+        },
+        "543": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.05,
+                "radiusBottom": 0.4
+              }
+            }
+          }
+        },
+        "544": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.05,
+                "radiusBottom": 0.4
+              }
+            }
+          }
+        },
+        "545": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.05,
+                "radiusBottom": 0.4
+              }
+            }
+          }
+        },
+        "549": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "550": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "551": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "552": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "553": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "556": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.45,
+                "radiusBottom": 0.45
+              }
+            }
+          }
+        },
+        "557": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.45,
+                "radiusBottom": 0.45
+              }
+            }
+          }
+        },
+        "558": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.05,
+                "radiusBottom": 0.4
+              }
+            }
+          }
+        },
+        "559": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.05,
+                "radiusBottom": 0.35
+              }
+            }
+          }
+        },
+        "560": {
+          "json": {
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.05,
+                "radiusBottom": 0.35
+              }
+            }
+          }
+        },
+        "562": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "563": {
+          "json": {
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "core::Material",
+      "data": {
+        "513": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.42,
+                  "g": 0.45,
+                  "b": 0.5,
+                  "a": 1
+                },
+                "metallic": 0,
+                "roughness": 1
+              }
+            }
+          }
+        },
+        "514": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "515": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "516": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "517": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "518": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "519": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "520": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "521": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "522": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "523": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "524": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "525": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "526": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "527": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "528": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "529": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "530": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "531": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.97,
+                  "g": 0.45,
+                  "b": 0.09,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.92,
+                  "g": 0.35,
+                  "b": 0.05,
+                  "a": 1
+                },
+                "emissiveIntensity": 2.5,
+                "metallic": 0,
+                "roughness": 0.4
+              }
+            }
+          }
+        },
+        "532": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "533": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.97,
+                  "g": 0.45,
+                  "b": 0.09,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.92,
+                  "g": 0.35,
+                  "b": 0.05,
+                  "a": 1
+                },
+                "emissiveIntensity": 2.5,
+                "metallic": 0,
+                "roughness": 0.4
+              }
+            }
+          }
+        },
+        "534": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "535": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.97,
+                  "g": 0.45,
+                  "b": 0.09,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.92,
+                  "g": 0.35,
+                  "b": 0.05,
+                  "a": 1
+                },
+                "emissiveIntensity": 2.5,
+                "metallic": 0,
+                "roughness": 0.4
+              }
+            }
+          }
+        },
+        "536": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.29,
+                  "g": 0.33,
+                  "b": 0.39,
+                  "a": 1
+                },
+                "metallic": 0.1,
+                "roughness": 0.9
+              }
+            }
+          }
+        },
+        "537": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.97,
+                  "g": 0.45,
+                  "b": 0.09,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.92,
+                  "g": 0.35,
+                  "b": 0.05,
+                  "a": 1
+                },
+                "emissiveIntensity": 2.5,
+                "metallic": 0,
+                "roughness": 0.4
+              }
+            }
+          }
+        },
+        "538": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.13,
+                  "g": 0.83,
+                  "b": 0.93,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.02,
+                  "g": 0.71,
+                  "b": 0.83,
+                  "a": 1
+                },
+                "emissiveIntensity": 1.5,
+                "metallic": 0.2,
+                "roughness": 0.25
+              }
+            }
+          }
+        },
+        "539": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.13,
+                  "g": 0.83,
+                  "b": 0.93,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.02,
+                  "g": 0.71,
+                  "b": 0.83,
+                  "a": 1
+                },
+                "emissiveIntensity": 1.5,
+                "metallic": 0.2,
+                "roughness": 0.25
+              }
+            }
+          }
+        },
+        "540": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.13,
+                  "g": 0.83,
+                  "b": 0.93,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.02,
+                  "g": 0.71,
+                  "b": 0.83,
+                  "a": 1
+                },
+                "emissiveIntensity": 1.5,
+                "metallic": 0.2,
+                "roughness": 0.25
+              }
+            }
+          }
+        },
+        "541": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.13,
+                  "g": 0.83,
+                  "b": 0.93,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.02,
+                  "g": 0.71,
+                  "b": 0.83,
+                  "a": 1
+                },
+                "emissiveIntensity": 1.5,
+                "metallic": 0.2,
+                "roughness": 0.25
+              }
+            }
+          }
+        },
+        "542": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.13,
+                  "g": 0.83,
+                  "b": 0.93,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.02,
+                  "g": 0.71,
+                  "b": 0.83,
+                  "a": 1
+                },
+                "emissiveIntensity": 1.5,
+                "metallic": 0.2,
+                "roughness": 0.25
+              }
+            }
+          }
+        },
+        "543": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.13,
+                  "g": 0.83,
+                  "b": 0.93,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.02,
+                  "g": 0.71,
+                  "b": 0.83,
+                  "a": 1
+                },
+                "emissiveIntensity": 1.5,
+                "metallic": 0.2,
+                "roughness": 0.25
+              }
+            }
+          }
+        },
+        "544": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.13,
+                  "g": 0.83,
+                  "b": 0.93,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.02,
+                  "g": 0.71,
+                  "b": 0.83,
+                  "a": 1
+                },
+                "emissiveIntensity": 1.5,
+                "metallic": 0.2,
+                "roughness": 0.25
+              }
+            }
+          }
+        },
+        "545": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.13,
+                  "g": 0.83,
+                  "b": 0.93,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.02,
+                  "g": 0.71,
+                  "b": 0.83,
+                  "a": 1
+                },
+                "emissiveIntensity": 1.5,
+                "metallic": 0.2,
+                "roughness": 0.25
+              }
+            }
+          }
+        },
+        "549": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.12,
+                  "g": 0.16,
+                  "b": 0.22,
+                  "a": 1
+                },
+                "metallic": 0.4,
+                "roughness": 0.7
+              }
+            }
+          }
+        },
+        "550": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.13,
+                  "g": 0.83,
+                  "b": 0.93,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.13,
+                  "g": 0.83,
+                  "b": 0.93,
+                  "a": 1
+                },
+                "emissiveIntensity": 2.5,
+                "metallic": 0.1,
+                "roughness": 0.2
+              }
+            }
+          }
+        },
+        "551": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.12,
+                  "g": 0.16,
+                  "b": 0.22,
+                  "a": 1
+                },
+                "metallic": 0.4,
+                "roughness": 0.7
+              }
+            }
+          }
+        },
+        "552": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.94,
+                  "g": 0.27,
+                  "b": 0.27,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.94,
+                  "g": 0.27,
+                  "b": 0.27,
+                  "a": 1
+                },
+                "emissiveIntensity": 3,
+                "metallic": 0,
+                "roughness": 0.3
+              }
+            }
+          }
+        },
+        "553": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.94,
+                  "g": 0.27,
+                  "b": 0.27,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.94,
+                  "g": 0.27,
+                  "b": 0.27,
+                  "a": 1
+                },
+                "emissiveIntensity": 3,
+                "metallic": 0,
+                "roughness": 0.3
+              }
+            }
+          }
+        },
+        "556": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.12,
+                  "g": 0.16,
+                  "b": 0.22,
+                  "a": 1
+                },
+                "metallic": 0.4,
+                "roughness": 0.7
+              }
+            }
+          }
+        },
+        "557": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.12,
+                  "g": 0.16,
+                  "b": 0.22,
+                  "a": 1
+                },
+                "metallic": 0.4,
+                "roughness": 0.7
+              }
+            }
+          }
+        },
+        "558": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.13,
+                  "g": 0.83,
+                  "b": 0.93,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.02,
+                  "g": 0.71,
+                  "b": 0.83,
+                  "a": 1
+                },
+                "emissiveIntensity": 1.5,
+                "metallic": 0.2,
+                "roughness": 0.25
+              }
+            }
+          }
+        },
+        "559": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.13,
+                  "g": 0.83,
+                  "b": 0.93,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.02,
+                  "g": 0.71,
+                  "b": 0.83,
+                  "a": 1
+                },
+                "emissiveIntensity": 1.5,
+                "metallic": 0.2,
+                "roughness": 0.25
+              }
+            }
+          }
+        },
+        "560": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.13,
+                  "g": 0.83,
+                  "b": 0.93,
+                  "a": 1
+                },
+                "emissiveColor": {
+                  "r": 0.02,
+                  "g": 0.71,
+                  "b": 0.83,
+                  "a": 1
+                },
+                "emissiveIntensity": 1.5,
+                "metallic": 0.2,
+                "roughness": 0.25
+              }
+            }
+          }
+        },
+        "562": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.12,
+                  "g": 0.16,
+                  "b": 0.22,
+                  "a": 1
+                },
+                "metallic": 0.4,
+                "roughness": 0.7
+              }
+            }
+          }
+        },
+        "563": {
+          "json": {
+            "material": {
+              "$case": "pbr",
+              "pbr": {
+                "albedoColor": {
+                  "r": 0.12,
+                  "g": 0.16,
+                  "b": 0.22,
+                  "a": 1
+                },
+                "metallic": 0.4,
+                "roughness": 0.7
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "core::MeshCollider",
+      "data": {
+        "513": {
+          "json": {
+            "collisionMask": 2,
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 13.5,
+                "radiusBottom": 13.5
+              }
+            }
+          }
+        },
+        "514": {
+          "json": {
+            "collisionMask": 2,
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "515": {
+          "json": {
+            "collisionMask": 2,
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "516": {
+          "json": {
+            "collisionMask": 2,
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "517": {
+          "json": {
+            "collisionMask": 2,
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "518": {
+          "json": {
+            "collisionMask": 2,
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "519": {
+          "json": {
+            "collisionMask": 2,
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "520": {
+          "json": {
+            "collisionMask": 2,
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "521": {
+          "json": {
+            "collisionMask": 2,
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "522": {
+          "json": {
+            "collisionMask": 2,
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "523": {
+          "json": {
+            "collisionMask": 2,
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "524": {
+          "json": {
+            "collisionMask": 2,
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "525": {
+          "json": {
+            "collisionMask": 2,
+            "mesh": {
+              "$case": "box",
+              "box": {
+                "uvs": []
+              }
+            }
+          }
+        },
+        "526": {
+          "json": {
+            "collisionMask": 2,
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.7,
+                "radiusBottom": 0.7
+              }
+            }
+          }
+        },
+        "527": {
+          "json": {
+            "collisionMask": 2,
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.7,
+                "radiusBottom": 0.7
+              }
+            }
+          }
+        },
+        "528": {
+          "json": {
+            "collisionMask": 2,
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.7,
+                "radiusBottom": 0.7
+              }
+            }
+          }
+        },
+        "529": {
+          "json": {
+            "collisionMask": 2,
+            "mesh": {
+              "$case": "cylinder",
+              "cylinder": {
+                "radiusTop": 0.7,
+                "radiusBottom": 0.7
+              }
+            }
+          }
+        },
+        "561": {
+          "json": {
+            "collisionMask": 1,
+            "mesh": {
+              "$case": "box",
+              "box": {}
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "core::TextShape",
+      "data": {
+        "546": {
+          "json": {
+            "text": "DEFEAT THE CRYSTAL GOLEM",
+            "fontSize": 2,
+            "textColor": {
+              "r": 1,
+              "g": 1,
+              "b": 1,
+              "a": 1
+            }
+          }
+        },
+        "547": {
+          "json": {
+            "text": "Click the golem to attack. Dodge the red circles.",
+            "fontSize": 1.1,
+            "textColor": {
+              "r": 0.8,
+              "g": 0.8,
+              "b": 0.8,
+              "a": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "core::Billboard",
+      "data": {
+        "546": {
+          "json": {
+            "billboardMode": 7
+          }
+        },
+        "547": {
+          "json": {
+            "billboardMode": 7
+          }
+        }
+      }
+    }
+  ]
+}

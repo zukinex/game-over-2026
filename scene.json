@@ -1,0 +1,55 @@
+{
+  "ecs7": true,
+  "runtimeVersion": "7",
+  "display": {
+    "title": "Crystal Golem — Final Boss",
+    "description": "A 5-minute final boss fight: defeat the Crystal Golem in its arena. GAME OVER 2026 entry.",
+    "navmapThumbnail": "images/scene-thumbnail.png",
+    "favicon": "favicon_asset"
+  },
+  "owner": "",
+  "contact": {
+    "name": "zukinex",
+    "email": ""
+  },
+  "main": "bin/index.js",
+  "tags": ["game"],
+  "scene": {
+    "parcels": [
+      "0,0",
+      "0,1",
+      "1,0",
+      "1,1"
+    ],
+    "base": "0,0"
+  },
+  "spawnPoints": [
+    {
+      "name": "spawn1",
+      "default": true,
+      "position": {
+        "x": [
+          15,
+          17
+        ],
+        "y": [
+          0,
+          0
+        ],
+        "z": [
+          4,
+          6
+        ]
+      },
+      "cameraTarget": {
+        "x": 16,
+        "y": 2,
+        "z": 25
+      }
+    }
+  ],
+  "featureToggles": {
+    "voiceChat": "enabled",
+    "portableExperiences": "enabled"
+  }
+}
