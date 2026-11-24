@@ -56,6 +56,11 @@ export const WIN_BONUS = 1000
 /** Time bonus: 10 points per second under the 5-minute limit. */
 export const TIME_BONUS_PER_SECOND = 10
 
+/** True once the 5-minute fight limit is reached: the fight must end. */
+export function isTimeUp(secondsElapsed: number): boolean {
+  return secondsElapsed >= FIGHT_TIME_LIMIT_S
+}
+
 /** Final score: win bonus + time bonus + shard score. */
 export function scoreFor(secondsElapsed: number, shardsSmashed: number): number {
   const timeBonus = Math.max(0, FIGHT_TIME_LIMIT_S - Math.floor(secondsElapsed)) * TIME_BONUS_PER_SECOND

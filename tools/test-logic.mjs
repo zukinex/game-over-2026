@@ -43,6 +43,10 @@ assert.equal(L.scoreFor(300, 0), 1000)
 assert.equal(L.scoreFor(120, 3), 1000 + 180 * 10 + 300)
 assert.equal(L.scoreFor(400, 0), 1000) // over the limit: no time bonus
 
+assert.equal(L.isTimeUp(299.9), false)
+assert.equal(L.isTimeUp(300), true)
+assert.equal(L.isTimeUp(301), true)
+
 assert.equal(L.formatTime(0), '0:00')
 assert.equal(L.formatTime(65), '1:05')
 assert.equal(L.formatTime(300), '5:00')

@@ -16,7 +16,8 @@ dodge its telegraphed attacks, and kill it in under 5 minutes.
 3. Click / tap the golem to attack (10 damage per hit, 0.4 s cooldown).
 4. Dodge: red circles (ground slam), flying crystals (volley), small shards
    that chase you (click them to smash: +100 score, +5 HP).
-5. Boss HP 300. Player HP 100. Win in ~2.5–4 min. Lose = HP 0.
+5. Boss HP 300. Player HP 100. Win in ~2.5–4 min. Lose = HP 0. Time up at
+   5:00 = defeat ("Time's up! The Golem endures.") — hard limit per jam rules.
 
 ## Boss phases [agent-decided]
 

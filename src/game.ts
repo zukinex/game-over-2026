@@ -35,6 +35,7 @@ import {
   clampHp,
   distanceXZ,
   insideSlamDisc,
+  isTimeUp,
   scoreFor
 } from './logic'
 
@@ -396,6 +397,14 @@ function bossAnimSystem(dt: number) {
 function fightSystem(dt: number) {
   if (state === 'fight') {
     timeS += dt
+    if (isTimeUp(timeS)) {
+      // Hard 5-minute limit (jam rules): the fight ends, win or lose.
+      state = 'defeat'
+      clearRuntimeEntities()
+      showBanner("Time's up! The Golem endures.", 4)
+      syncHud()
+      return
+    }
     if (telegraph) {
       telegraph.t += dt
       if (telegraph.t >= SLAM_TELEGRAPH_S) detonateSlam()
