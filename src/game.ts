@@ -12,7 +12,6 @@ import {
   Material,
   MaterialTransparencyMode,
   VisibilityComponent,
-  PointerEvents,
   PointerEventType,
   InputAction,
   pointerEventsSystem,
@@ -498,7 +497,7 @@ export function setupGame() {
     pointerEventsSystem.onPointerDown(
       {
         entity: bossHitbox,
-        opts: { button: InputAction.IA_POINTER, hoverText: 'Attack!', maxDistance: 16 }
+        opts: { button: InputAction.IA_POINTER, hoverText: 'Attack!', maxDistance: 24 }
       },
       () => {
         if (state !== 'fight') return
