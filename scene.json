@@ -1,6 +1,9 @@
 {
   "ecs7": true,
   "runtimeVersion": "7",
+  "worldConfiguration": {
+    "name": "rgl15.dcl.eth"
+  },
   "display": {
     "title": "Crystal Golem — Final Boss",
     "description": "A 5-minute final boss fight: defeat the Crystal Golem in its arena. GAME OVER 2026 entry.",

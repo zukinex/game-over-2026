@@ -20,6 +20,7 @@ import {
 import type { Entity } from '@dcl/sdk/ecs'
 import { Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
 import { EntityNames } from '../assets/scene/entity-names'
+import { initAudio, playSfx } from './audio'
 import {
   BOSS_MAX_HP,
   PLAYER_MAX_HP,
@@ -150,6 +151,7 @@ function damagePlayer(amount: number) {
   playerHp = clampHp(playerHp - amount, PLAYER_MAX_HP)
   if (playerHp <= 0) {
     state = 'defeat'
+    playSfx('defeat')
     showBanner('The Golem stands victorious...', 4)
     syncHud()
   }
@@ -163,6 +165,7 @@ function damageBoss(amount: number) {
   hitFlashT = 0.15
   const nextPhase = phaseForHp(bossHp)
   if (nextPhase !== prevPhase) {
+    playSfx('phase')
     if (nextPhase === 2) showBanner("Phase 2! 'My heart is safe!' — Volley incoming!")
     if (nextPhase === 3) {
       showBanner("FINAL PHASE! 'My spikes guard my heart!'")
@@ -205,6 +208,7 @@ function damageSpike(index: number) {
   lastPlayerAttackAt = timeS
   spikeHp[index] = Math.max(0, spikeHp[index] - PLAYER_ATTACK_DAMAGE)
   spikeFlashT[index] = 0.15
+  playSfx('spikeHit')
   damageBoss(SPIKE_CLICK_BOSS_DAMAGE)
   if (state !== 'fight') {
     syncHud()
@@ -212,6 +216,7 @@ function damageSpike(index: number) {
   }
   if (spikeHp[index] <= 0) {
     spikesBroken++
+    playSfx('spikeShatter')
     const e = breakableSpikes[index]
     if (e) VisibilityComponent.createOrReplace(e, { visible: false })
     if (allSpikesBroken(spikesBroken)) {
@@ -236,6 +241,7 @@ function exposeCore() {
     })
   }
   showBanner('The core is exposed! Strike now!', 4)
+  playSfx('phase')
 }
 
 function clearRuntimeEntities() {
@@ -257,6 +263,7 @@ export function startFight() {
   attackTimer = 1.5 // first attack 1.5 s after START
   attackIndex = 0
   lastPlayerAttackAt = -1
+  playSfx('start')
   showBanner('The Crystal Golem awakens!')
   syncHud()
 }
@@ -302,6 +309,7 @@ export function resetFight() {
     VisibilityComponent.createOrReplace(e, { visible: true })
   }
   state = 'fight'
+  playSfx('start')
   showBanner('Round two — the Golem awakens!')
   syncHud()
 }
@@ -330,6 +338,7 @@ function fireAttack() {
     })
     telegraph = { t: 0, x: p.x, z: p.z, disc }
   } else if (kind === 'volley') {
+    playSfx('volley')
     const count = volleyCountForPhase(phase)
     const root = bossRoot !== NO_ENTITY ? Transform.getOrNull(bossRoot) : null
     const ox = root ? root.position.x : BOSS_ROOT_POS.x
@@ -354,6 +363,7 @@ function fireAttack() {
     }
   } else {
     // shards: 3 minions at the arena edge, chasing the player.
+    playSfx('volley')
     for (let i = 0; i < SHARDS_PER_SUMMON; i++) {
       const angle = (i / SHARDS_PER_SUMMON) * Math.PI * 2 + Math.random() * 0.8
       const x = 16 + 11 * Math.sin(angle)
@@ -385,12 +395,14 @@ function smashShard(entity: Entity) {
   shards.splice(idx, 1)
   engine.removeEntity(entity)
   shardsSmashed++
+  playSfx('shardSmash')
   playerHp = clampHp(playerHp + SHARD_HEAL, PLAYER_MAX_HP)
   syncHud()
 }
 
 function detonateSlam() {
   if (!telegraph) return
+  playSfx('slam')
   const p = playerXZ()
   if (p && insideSlamDisc(p.x, p.z, telegraph.x, telegraph.z, SLAM_RADIUS)) {
     damagePlayer(20)
@@ -510,6 +522,7 @@ function fightSystem(dt: number) {
     if (isTimeUp(timeS)) {
       // Hard 5-minute limit (jam rules): the fight ends, win or lose.
       state = 'defeat'
+      playSfx('defeat')
       clearRuntimeEntities()
       showBanner("Time's up! The Golem endures.", 4)
       syncHud()
@@ -527,6 +540,7 @@ function fightSystem(dt: number) {
     if (dyingT >= 3) {
       if (bossRoot) VisibilityComponent.createOrReplace(bossRoot, { visible: false })
       state = 'victory'
+      playSfx('victory')
       syncHud()
     }
   }
@@ -594,6 +608,7 @@ function fetchEntity(name: EntityNames): Entity {
 }
 
 export function setupGame() {
+  initAudio()
   bossRoot = fetchEntity(EntityNames.BossRoot)
   bossTorso = fetchEntity(EntityNames.BossTorso)
   bossChestCore = fetchEntity(EntityNames.BossChestCore)
@@ -622,6 +637,7 @@ export function setupGame() {
         if (state !== 'fight') return
         if (timeS - lastPlayerAttackAt < PLAYER_ATTACK_COOLDOWN_S) return
         lastPlayerAttackAt = timeS
+        playSfx('hit')
         damageBoss(bodyHitDamage(coreExposed))
       }
     )
