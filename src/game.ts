@@ -14,11 +14,13 @@ import {
   VisibilityComponent,
   PointerEventType,
   InputAction,
+  inputSystem,
   pointerEventsSystem,
   ColliderLayer
 } from '@dcl/sdk/ecs'
 import type { Entity } from '@dcl/sdk/ecs'
 import { Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
+import { movePlayerTo } from '~system/RestrictedActions'
 import { EntityNames } from '../assets/scene/entity-names'
 import { initAudio, playSfx } from './audio'
 import {
@@ -26,6 +28,12 @@ import {
   PLAYER_MAX_HP,
   PLAYER_ATTACK_DAMAGE,
   PLAYER_ATTACK_COOLDOWN_S,
+  HEAVY_COOLDOWN_S,
+  DODGE_IFRAMES_S,
+  DODGE_COOLDOWN_S,
+  DODGE_DISTANCE,
+  SHARDLING_MAX_ALIVE,
+  SHARDLING_FIRST_SPAWN_S,
   SPIKE_COUNT,
   SPIKE_MAX_HP,
   SPIKE_CLICK_BOSS_DAMAGE,
@@ -37,6 +45,13 @@ import {
   phaseForHp,
   volleyCountForPhase,
   bodyHitDamage,
+  heavyHitDamage,
+  chargeFraction,
+  isChargeFull,
+  dodgeReady,
+  dodgeActive,
+  dashTarget,
+  shardlingSpawnIntervalS,
   allSpikesBroken,
   clampHp,
   distanceXZ,
@@ -58,6 +73,10 @@ export const hudState: {
   score: number
   shardsSmashed: number
   spikesBroken: number
+  charge: number
+  heavyReady: boolean
+  dodgeCooldown: number
+  dodging: boolean
   banner: string | null
 } = {
   phase: 'intro',
@@ -69,6 +88,10 @@ export const hudState: {
   score: 0,
   shardsSmashed: 0,
   spikesBroken: 0,
+  charge: 0,
+  heavyReady: true,
+  dodgeCooldown: 0,
+  dodging: false,
   banner: null
 }
 
@@ -90,6 +113,15 @@ let spikesBroken = 0
 let coreExposed = false
 let spikeHp: number[] = [SPIKE_MAX_HP, SPIKE_MAX_HP]
 let spikeFlashT: number[] = [0, 0]
+// Charged heavy attack: hold the golem, release to strike.
+let chargeStartAt = -1
+let heavyReadyAt = -HEAVY_COOLDOWN_S
+// Dodge: dash + brief invulnerability, on a cooldown.
+let dodgeUntil = -1
+let lastDodgeAt = -DODGE_COOLDOWN_S
+// Shardlings: periodic minion spawns (the phase-3 shards attack bursts reuse them).
+let shardlingTimer = SHARDLING_FIRST_SPAWN_S
+let shardlingBannerShown = false
 // Breakable shoulder spikes (Spike2 left, Spike3 right). Spike1 (center)
 // hides behind the head, so it stays visual-only.
 let breakableSpikes: Entity[] = []
@@ -142,17 +174,23 @@ function syncHud() {
   hudState.timeS = timeS
   hudState.shardsSmashed = shardsSmashed
   hudState.spikesBroken = spikesBroken
+  hudState.charge = chargeStartAt >= 0 ? chargeFraction(timeS - chargeStartAt) : 0
+  hudState.heavyReady = timeS >= heavyReadyAt
+  hudState.dodgeCooldown = Math.max(0, lastDodgeAt + DODGE_COOLDOWN_S - timeS)
+  hudState.dodging = dodgeActive(dodgeUntil, timeS)
   hudState.score =
     state === 'victory' ? scoreFor(timeS, shardsSmashed, spikesBroken) : hudState.score
 }
 
 function damagePlayer(amount: number) {
   if (state !== 'fight') return
+  if (dodgeActive(dodgeUntil, timeS)) return // dodging: the hit whiffs
   playerHp = clampHp(playerHp - amount, PLAYER_MAX_HP)
   if (playerHp <= 0) {
+    chargeStartAt = -1
     state = 'defeat'
     playSfx('defeat')
-    showBanner('The Golem stands victorious...', 4)
+    showBanner('The Golem endures... The mountain keeps its secret — for now.', 4)
     syncHud()
   }
   syncHud()
@@ -263,6 +301,7 @@ export function startFight() {
   attackTimer = 1.5 // first attack 1.5 s after START
   attackIndex = 0
   lastPlayerAttackAt = -1
+  shardlingTimer = SHARDLING_FIRST_SPAWN_S
   playSfx('start')
   showBanner('The Crystal Golem awakens!')
   syncHud()
@@ -276,6 +315,12 @@ export function resetFight() {
   attackTimer = 1.5
   attackIndex = 0
   lastPlayerAttackAt = -1
+  chargeStartAt = -1
+  heavyReadyAt = -HEAVY_COOLDOWN_S
+  dodgeUntil = -1
+  lastDodgeAt = -DODGE_COOLDOWN_S
+  shardlingTimer = SHARDLING_FIRST_SPAWN_S
+  shardlingBannerShown = false
   dyingT = 0
   shardsSmashed = 0
   spikesBroken = 0
@@ -311,6 +356,44 @@ export function resetFight() {
   state = 'fight'
   playSfx('start')
   showBanner('Round two — the Golem awakens!')
+  syncHud()
+}
+
+/** Spawn one shardling minion at (x, z): chases the player, smashable to heal.
+ *  Shared by the phase-3 shards attack and the periodic spawner. */
+function spawnShardling(x: number, z: number) {
+  const e = engine.addEntity()
+  Transform.create(e, { position: { x, y: 0.45, z }, scale: { x: 1, y: 0.9, z: 1 } })
+  MeshRenderer.setCylinder(e, 0.02, 0.35)
+  Material.setPbrMaterial(e, {
+    albedoColor: Color4.fromHexString('#e879f9'),
+    emissiveColor: Color4.fromHexString('#d946ef'),
+    emissiveIntensity: 2,
+    roughness: 0.2,
+    metallic: 0.1
+  })
+  MeshCollider.setBox(e, ColliderLayer.CL_POINTER)
+  pointerEventsSystem.onPointerDown(
+    { entity: e, opts: { button: InputAction.IA_POINTER, hoverText: 'Smash!', maxDistance: 12 } },
+    () => smashShard(e)
+  )
+  shards.push({ entity: e, touchCooldown: 0 })
+}
+
+/** Dodge: dash 3 m away from the golem + 0.6 s of invulnerability.
+ *  Works from the HUD button and the F key. The slide uses movePlayerTo
+ *  (no scene permission needed); even if the slide fails, the i-frames
+ *  still apply, so the dodge never silently does nothing. */
+export function tryDodge() {
+  if (state !== 'fight') return
+  if (!dodgeReady(lastDodgeAt, timeS)) return
+  const p = playerXZ()
+  if (!p) return
+  lastDodgeAt = timeS
+  dodgeUntil = timeS + DODGE_IFRAMES_S
+  playSfx('dodge')
+  const target = dashTarget(p.x, p.z, p.x - BOSS_ROOT_POS.x, p.z - BOSS_ROOT_POS.z, DODGE_DISTANCE)
+  void movePlayerTo({ newRelativePosition: Vector3.create(target.x, 0, target.z), duration: 0.15 })
   syncHud()
 }
 
@@ -362,28 +445,11 @@ function fireAttack() {
       projectiles.push({ entity: e, dirX: (tx - ox) / len, dirZ: (tz - oz) / len, life: PROJECTILE_LIFE_S })
     }
   } else {
-    // shards: 3 minions at the arena edge, chasing the player.
+    // shards: 3 shardlings at the arena edge, chasing the player.
     playSfx('volley')
     for (let i = 0; i < SHARDS_PER_SUMMON; i++) {
       const angle = (i / SHARDS_PER_SUMMON) * Math.PI * 2 + Math.random() * 0.8
-      const x = 16 + 11 * Math.sin(angle)
-      const z = 16 + 11 * Math.cos(angle)
-      const e = engine.addEntity()
-      Transform.create(e, { position: { x, y: 0.45, z }, scale: { x: 1, y: 0.9, z: 1 } })
-      MeshRenderer.setCylinder(e, 0.02, 0.35)
-      Material.setPbrMaterial(e, {
-        albedoColor: Color4.fromHexString('#e879f9'),
-        emissiveColor: Color4.fromHexString('#d946ef'),
-        emissiveIntensity: 2,
-        roughness: 0.2,
-        metallic: 0.1
-      })
-      MeshCollider.setBox(e, ColliderLayer.CL_POINTER)
-      pointerEventsSystem.onPointerDown(
-        { entity: e, opts: { button: InputAction.IA_POINTER, hoverText: 'Smash!', maxDistance: 12 } },
-        () => smashShard(e)
-      )
-      shards.push({ entity: e, touchCooldown: 0 })
+      spawnShardling(16 + 11 * Math.sin(angle), 16 + 11 * Math.cos(angle))
     }
   }
 }
@@ -523,11 +589,32 @@ function fightSystem(dt: number) {
     if (isTimeUp(timeS)) {
       // Hard 5-minute limit (jam rules): the fight ends, win or lose.
       state = 'defeat'
+      chargeStartAt = -1
       playSfx('defeat')
       clearRuntimeEntities()
       showBanner("Time's up! The Golem endures.", 4)
       syncHud()
       return
+    }
+    // F key dodges (the HUD DODGE button calls tryDodge directly).
+    if (inputSystem.isTriggered(InputAction.IA_SECONDARY, PointerEventType.PET_DOWN)) {
+      tryDodge()
+    }
+    // Stale charge guard: if the pointer-up never arrives, drop the charge.
+    if (chargeStartAt >= 0 && timeS - chargeStartAt > 3) chargeStartAt = -1
+    // Periodic shardlings: a second enemy from early in the fight, so the
+    // golem is never the only thing to fight.
+    shardlingTimer -= dt
+    if (shardlingTimer <= 0) {
+      shardlingTimer = shardlingSpawnIntervalS(phaseForHp(bossHp))
+      if (shards.length < SHARDLING_MAX_ALIVE) {
+        const angle = Math.random() * Math.PI * 2
+        spawnShardling(16 + 11 * Math.sin(angle), 16 + 11 * Math.cos(angle))
+        if (!shardlingBannerShown) {
+          shardlingBannerShown = true
+          showBanner('Shardlings incoming — smash them to heal!')
+        }
+      }
     }
     if (telegraph) {
       telegraph.t += dt
@@ -627,21 +714,38 @@ export function setupGame() {
     fetchEntity(EntityNames.TorchFlame4)
   ].filter((e) => e !== NO_ENTITY)
 
-  // Click / tap the golem to attack. Registered once, guarded by state.
+  // Click / tap the golem to attack; hold to charge a heavy blow.
+  // Registered once, guarded by state. Damage lands on release, so a quick
+  // click still hits exactly like before and a full hold strikes heavy.
   if (bossHitbox) {
-    pointerEventsSystem.onPointerDown(
-      {
-        entity: bossHitbox,
-        opts: { button: InputAction.IA_POINTER, hoverText: 'Attack!', maxDistance: 24 }
-      },
-      () => {
-        if (state !== 'fight') return
-        if (timeS - lastPlayerAttackAt < PLAYER_ATTACK_COOLDOWN_S) return
+    const hitboxOpts = {
+      entity: bossHitbox,
+      opts: { button: InputAction.IA_POINTER, hoverText: 'Attack! Hold to charge...', maxDistance: 24 }
+    }
+    pointerEventsSystem.onPointerDown(hitboxOpts, () => {
+      if (state !== 'fight') return
+      if (chargeStartAt >= 0) return // already charging
+      chargeStartAt = timeS
+    })
+    pointerEventsSystem.onPointerUp(hitboxOpts, () => {
+      if (state !== 'fight') {
+        chargeStartAt = -1
+        return
+      }
+      if (chargeStartAt < 0) return
+      const held = timeS - chargeStartAt
+      chargeStartAt = -1
+      if (isChargeFull(held) && timeS >= heavyReadyAt) {
+        heavyReadyAt = timeS + HEAVY_COOLDOWN_S
+        playSfx('heavy')
+        damageBoss(heavyHitDamage(coreExposed))
+      } else if (timeS - lastPlayerAttackAt >= PLAYER_ATTACK_COOLDOWN_S) {
         lastPlayerAttackAt = timeS
         playSfx('hit')
         damageBoss(bodyHitDamage(coreExposed))
       }
-    )
+      syncHud()
+    })
   }
 
   // Breakable shoulder spikes (the hidden weakness): the center spike hides

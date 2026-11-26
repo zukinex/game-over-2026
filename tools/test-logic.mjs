@@ -67,6 +67,31 @@ assert.equal(L.clampHp(-5, 100), 0)
 assert.equal(L.clampHp(150, 100), 100)
 assert.equal(L.clampHp(50, 100), 50)
 
+// Charged heavy blow: 25 base, 50 with the core exposed.
+assert.equal(L.heavyHitDamage(false), 25)
+assert.equal(L.heavyHitDamage(true), 50)
+assert.equal(L.chargeFraction(0), 0)
+assert.equal(L.chargeFraction(0.4), 0.5)
+assert.equal(L.chargeFraction(0.8), 1)
+assert.equal(L.chargeFraction(2), 1)
+assert.equal(L.isChargeFull(0.79), false)
+assert.equal(L.isChargeFull(0.8), true)
+
+// Dodge: 3 s cooldown, 0.6 s of invulnerability.
+assert.equal(L.dodgeReady(-3, 0), true)
+assert.equal(L.dodgeReady(0, 2.9), false)
+assert.equal(L.dodgeReady(0, 3), true)
+assert.equal(L.dodgeActive(0.6, 0.5), true)
+assert.equal(L.dodgeActive(0.6, 0.6), false)
+assert.deepEqual(L.dashTarget(16, 16, 1, 0, 3), { x: 19, z: 16 })
+assert.deepEqual(L.dashTarget(29, 16, 1, 0, 3), { x: 30, z: 16 }) // clamped at the wall
+assert.deepEqual(L.dashTarget(16, 16, 0, 0, 3), { x: 16, z: 19 }) // zero direction -> south
+
+// Shardlings: spawn interval shortens as phases advance.
+assert.equal(L.shardlingSpawnIntervalS(1), 12)
+assert.equal(L.shardlingSpawnIntervalS(2), 9)
+assert.equal(L.shardlingSpawnIntervalS(3), 7)
+
 assert.equal(L.distanceXZ(0, 0, 3, 4), 5)
 assert.equal(L.insideSlamDisc(16, 16, 16, 16, 2.5), true)
 assert.equal(L.insideSlamDisc(19, 16, 16, 16, 2.5), false)

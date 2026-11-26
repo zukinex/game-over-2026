@@ -29,6 +29,8 @@ export type SfxName =
   | 'victory'
   | 'defeat'
   | 'start'
+  | 'dodge'
+  | 'heavy'
 
 const CLIPS: { name: SfxName; file: string; volume: number; pitchJitter?: number }[] = [
   { name: 'hit', file: 'assets/Audio/hit.mp3', volume: 0.7, pitchJitter: 0.06 },
@@ -40,7 +42,9 @@ const CLIPS: { name: SfxName; file: string; volume: number; pitchJitter?: number
   { name: 'phase', file: 'assets/Audio/phase.mp3', volume: 0.7 },
   { name: 'victory', file: 'assets/Audio/victory.mp3', volume: 0.8 },
   { name: 'defeat', file: 'assets/Audio/defeat.mp3', volume: 0.8 },
-  { name: 'start', file: 'assets/Audio/start.mp3', volume: 0.7 }
+  { name: 'start', file: 'assets/Audio/start.mp3', volume: 0.7 },
+  { name: 'dodge', file: 'assets/Audio/dodge.mp3', volume: 0.7 },
+  { name: 'heavy', file: 'assets/Audio/heavy.mp3', volume: 0.9 }
 ]
 
 const entities = new Map<SfxName, Entity>()

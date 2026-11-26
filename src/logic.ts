@@ -123,3 +123,77 @@ export function insideSlamDisc(
 ): boolean {
   return distanceXZ(playerX, playerZ, discX, discZ) <= radius
 }
+
+// ------------------------------------------------------------------ heavy attack
+/** Damage of a charged heavy blow: hold the golem to charge, release to strike. */
+export const HEAVY_DAMAGE = 25
+/** Seconds of holding to fully charge a heavy blow. */
+export const CHARGE_TIME_S = 0.8
+/** Seconds after a heavy blow before the next one can be charged. */
+export const HEAVY_COOLDOWN_S = 2.5
+
+/** Damage of a heavy blow: doubled once the core is exposed. */
+export function heavyHitDamage(coreExposed: boolean): number {
+  return HEAVY_DAMAGE * (coreExposed ? CORE_EXPOSED_MULTIPLIER : 1)
+}
+
+/** Charge bar fill 0..1 for a hold of `heldS` seconds. */
+export function chargeFraction(heldS: number): number {
+  return Math.max(0, Math.min(1, heldS / CHARGE_TIME_S))
+}
+
+/** True once the hold is long enough for a heavy blow. */
+export function isChargeFull(heldS: number): boolean {
+  return heldS >= CHARGE_TIME_S
+}
+
+// ------------------------------------------------------------------ dodge
+/** Invulnerability window granted by a dodge, in seconds. */
+export const DODGE_IFRAMES_S = 0.6
+/** Seconds between dodges. */
+export const DODGE_COOLDOWN_S = 3
+/** Dash distance in metres. */
+export const DODGE_DISTANCE = 3
+
+/** True when the dodge cooldown has elapsed. */
+export function dodgeReady(lastDodgeAt: number, nowS: number): boolean {
+  return nowS - lastDodgeAt >= DODGE_COOLDOWN_S
+}
+
+/** True while the dodge invulnerability window is open. */
+export function dodgeActive(dodgeUntil: number, nowS: number): boolean {
+  return nowS < dodgeUntil
+}
+
+// ------------------------------------------------------------------ shardlings
+/** Arena bounds for dash targets (the 2x2-parcel World spans 0..32). */
+export const ARENA_MIN = 2
+export const ARENA_MAX = 30
+
+/** Dash target: step `distance` metres from (px, pz) along (dx, dz),
+ *  clamped inside the arena. A zero direction dashes south (+Z). */
+export function dashTarget(
+  px: number,
+  pz: number,
+  dx: number,
+  dz: number,
+  distance: number
+): { x: number; z: number } {
+  const len = Math.hypot(dx, dz)
+  const ux = len < 0.01 ? 0 : dx / len
+  const uz = len < 0.01 ? 1 : dz / len
+  return {
+    x: Math.max(ARENA_MIN, Math.min(ARENA_MAX, px + ux * distance)),
+    z: Math.max(ARENA_MIN, Math.min(ARENA_MAX, pz + uz * distance))
+  }
+}
+
+/** Max shardlings alive at once (the phase-3 shards attack can burst past this). */
+export const SHARDLING_MAX_ALIVE = 3
+/** First periodic shardling spawns 10 s into the fight, so phase 1 gets a second enemy fast. */
+export const SHARDLING_FIRST_SPAWN_S = 10
+
+/** Seconds between periodic shardling spawns, by phase. */
+export function shardlingSpawnIntervalS(phase: BossPhase): number {
+  return phase === 1 ? 12 : phase === 2 ? 9 : 7
+}
