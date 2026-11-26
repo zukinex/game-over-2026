@@ -25,7 +25,7 @@ weakness to discover.
   gain 0.6 s of invulnerability. 3 s cooldown — time it against the red
   circles.
 - Shardlings: small crystal minions spawn through the fight and chase you.
-  Click them to smash: +100 score, +5 HP.
+  Click them to smash: +100 score, +10 HP.
 - Goal: defeat the Crystal Golem (300 HP) in under 5 minutes.
 - Ground Slam: a red circle appears where you stand — get out before it
   detonates.

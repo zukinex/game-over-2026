@@ -127,7 +127,7 @@ let shardlingBannerShown = false
 let breakableSpikes: Entity[] = []
 
 const SLAM_RADIUS = 2.5
-const SLAM_TELEGRAPH_S = 0.9
+const SLAM_TELEGRAPH_S = 1.2
 const PROJECTILE_SPEED = 8
 const PROJECTILE_LIFE_S = 3
 const SHARD_SPEED = 1.2
@@ -363,7 +363,7 @@ export function resetFight() {
  *  Shared by the phase-3 shards attack and the periodic spawner. */
 function spawnShardling(x: number, z: number) {
   const e = engine.addEntity()
-  Transform.create(e, { position: { x, y: 0.45, z }, scale: { x: 1, y: 0.9, z: 1 } })
+  Transform.create(e, { position: { x, y: 0.45, z }, scale: { x: 1.3, y: 1.2, z: 1.3 } })
   MeshRenderer.setCylinder(e, 0.02, 0.35)
   Material.setPbrMaterial(e, {
     albedoColor: Color4.fromHexString('#e879f9'),
@@ -471,7 +471,7 @@ function detonateSlam() {
   playSfx('slam')
   const p = playerXZ()
   if (p && insideSlamDisc(p.x, p.z, telegraph.x, telegraph.z, SLAM_RADIUS)) {
-    damagePlayer(20)
+    damagePlayer(15)
   }
   engine.removeEntity(telegraph.disc)
   telegraph = null
@@ -603,13 +603,14 @@ function fightSystem(dt: number) {
     // Stale charge guard: if the pointer-up never arrives, drop the charge.
     if (chargeStartAt >= 0 && timeS - chargeStartAt > 3) chargeStartAt = -1
     // Periodic shardlings: a second enemy from early in the fight, so the
-    // golem is never the only thing to fight.
+    // golem is never the only thing to fight. They spawn close (7 m) and big
+    // enough to be impossible to miss.
     shardlingTimer -= dt
     if (shardlingTimer <= 0) {
       shardlingTimer = shardlingSpawnIntervalS(phaseForHp(bossHp))
       if (shards.length < SHARDLING_MAX_ALIVE) {
         const angle = Math.random() * Math.PI * 2
-        spawnShardling(16 + 11 * Math.sin(angle), 16 + 11 * Math.cos(angle))
+        spawnShardling(16 + 7 * Math.sin(angle), 16 + 7 * Math.cos(angle))
         if (!shardlingBannerShown) {
           shardlingBannerShown = true
           showBanner('Shardlings incoming — smash them to heal!')

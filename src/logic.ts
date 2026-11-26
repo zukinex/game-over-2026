@@ -11,7 +11,7 @@ export type BossPhase = 1 | 2 | 3
 export type AttackKind = 'slam' | 'volley' | 'shards'
 
 export const DAMAGE: Record<AttackKind | 'shardTouch', number> = {
-  slam: 20,
+  slam: 15,
   volley: 10,
   shards: 0, // shards themselves deal no damage; their touch does
   shardTouch: 10
@@ -26,7 +26,7 @@ export function phaseForHp(bossHp: number): BossPhase {
 
 /** Seconds between boss attacks, by phase. */
 export function attackCooldownForPhase(phase: BossPhase): number {
-  return phase === 1 ? 2.8 : phase === 2 ? 2.2 : 1.7
+  return phase === 1 ? 3.5 : phase === 2 ? 2.2 : 1.7
 }
 
 /**
@@ -48,7 +48,7 @@ export function volleyCountForPhase(phase: BossPhase): number {
 /** Shards summoned per shards attack. */
 export const SHARDS_PER_SUMMON = 3
 /** Heal on smashing a shard. */
-export const SHARD_HEAL = 5
+export const SHARD_HEAL = 10
 /** Score per smashed shard. */
 export const SHARD_SCORE = 100
 /** Win bonus. */
@@ -189,9 +189,9 @@ export function dashTarget(
 }
 
 /** Max shardlings alive at once (the phase-3 shards attack can burst past this). */
-export const SHARDLING_MAX_ALIVE = 3
-/** First periodic shardling spawns 10 s into the fight, so phase 1 gets a second enemy fast. */
-export const SHARDLING_FIRST_SPAWN_S = 10
+export const SHARDLING_MAX_ALIVE = 4
+/** First periodic shardling spawns 8 s into the fight, so phase 1 gets a second enemy fast. */
+export const SHARDLING_FIRST_SPAWN_S = 8
 
 /** Seconds between periodic shardling spawns, by phase. */
 export function shardlingSpawnIntervalS(phase: BossPhase): number {

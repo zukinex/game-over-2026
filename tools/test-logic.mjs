@@ -21,7 +21,7 @@ assert.equal(L.phaseForHp(101), 2)
 assert.equal(L.phaseForHp(100), 3)
 assert.equal(L.phaseForHp(0), 3)
 
-assert.equal(L.attackCooldownForPhase(1), 2.8)
+assert.equal(L.attackCooldownForPhase(1), 3.5)
 assert.equal(L.attackCooldownForPhase(2), 2.2)
 assert.equal(L.attackCooldownForPhase(3), 1.7)
 
@@ -91,6 +91,12 @@ assert.deepEqual(L.dashTarget(16, 16, 0, 0, 3), { x: 16, z: 19 }) // zero direct
 assert.equal(L.shardlingSpawnIntervalS(1), 12)
 assert.equal(L.shardlingSpawnIntervalS(2), 9)
 assert.equal(L.shardlingSpawnIntervalS(3), 7)
+
+// Difficulty tuning (playtest 2026-11-26: the golem was too punishing).
+assert.equal(L.DAMAGE.slam, 15)
+assert.equal(L.SHARD_HEAL, 10)
+assert.equal(L.SHARDLING_MAX_ALIVE, 4)
+assert.equal(L.SHARDLING_FIRST_SPAWN_S, 8)
 
 assert.equal(L.distanceXZ(0, 0, 3, 4), 5)
 assert.equal(L.insideSlamDisc(16, 16, 16, 16, 2.5), true)
