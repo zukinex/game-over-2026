@@ -30,7 +30,7 @@ face the 4.5 m Crystal Golem, and bring it down before your HP runs out.
 
 ## Decentraland World name
 
-[RGL-assigned World name — fill in after the World Access form is approved]
+rgl15.dcl.eth
 
 ## Creators
 

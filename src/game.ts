@@ -487,13 +487,14 @@ function bossAnimSystem(dt: number) {
     rootT.rotation = Quaternion.fromAngleAxis(bossYaw + dyingT * 3, Vector3.Up())
     return
   }
-  // Idle bob.
-  rootT.position.y = BOSS_ROOT_POS.y + Math.sin(clock * 1.5) * 0.06
+  // Idle bob — big and visible from across the arena (playtest 2026-11-26:
+  // the golem read as frozen with a 0.06 bob on a 4.5 m body).
+  rootT.position.y = BOSS_ROOT_POS.y + Math.sin(clock * 1.5) * 0.18
   rootT.rotation = Quaternion.fromAngleAxis(bossYaw, Vector3.Up())
 
-  // Arms: raise during the slam telegraph, else hang with a slight sway.
+  // Arms: raise during the slam telegraph, else hang with a wide sway.
   const raise = telegraph ? Math.min(1, telegraph.t / 0.35) : 0
-  const sway = Math.sin(clock * 1.5) * 0.06
+  const sway = Math.sin(clock * 1.5) * 0.15
   const armAngle = -2.09 * raise + sway
   if (bossArmPivotL) {
     Transform.getMutable(bossArmPivotL).rotation = Quaternion.fromAngleAxis(armAngle, Vector3.Left())
@@ -502,15 +503,15 @@ function bossAnimSystem(dt: number) {
     Transform.getMutable(bossArmPivotR).rotation = Quaternion.fromAngleAxis(armAngle, Vector3.Right())
   }
 
-  // Chest core pulses on hit.
+  // Chest core breathes continuously + pulses on hit.
   if (bossChestCore) {
-    const s = 1 + hitFlashT * 1.5
+    const s = 1 + Math.sin(clock * 1.5) * 0.12 + hitFlashT * 1.5
     Transform.getMutable(bossChestCore).scale = { x: 0.9 * s, y: 0.9 * s, z: 0.3 * s }
   }
-  // Head tracks the bob slightly.
+  // Head tracks the bob, wider now so the golem reads as alive.
   if (bossHead) {
     Transform.getMutable(bossHead).rotation = Quaternion.fromAngleAxis(
-      Math.sin(clock * 0.9) * 0.08,
+      Math.sin(clock * 0.9) * 0.15,
       Vector3.Up()
     )
   }
