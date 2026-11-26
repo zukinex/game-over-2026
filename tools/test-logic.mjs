@@ -102,4 +102,18 @@ assert.equal(L.distanceXZ(0, 0, 3, 4), 5)
 assert.equal(L.insideSlamDisc(16, 16, 16, 16, 2.5), true)
 assert.equal(L.insideSlamDisc(19, 16, 16, 16, 2.5), false)
 
+// Combo (v5): every 5 consecutive hits raises the score multiplier, capped at x4.
+assert.equal(L.comboMultiplier(0), 1)
+assert.equal(L.comboMultiplier(4), 1)
+assert.equal(L.comboMultiplier(5), 2)
+assert.equal(L.comboMultiplier(9), 2)
+assert.equal(L.comboMultiplier(10), 3)
+assert.equal(L.comboMultiplier(15), 4)
+assert.equal(L.comboMultiplier(100), 4)
+assert.equal(L.hitScoreFor(10, 0), 10)
+assert.equal(L.hitScoreFor(10, 5), 20)
+assert.equal(L.hitScoreFor(25, 10), 75)
+assert.equal(L.scoreFor(0, 0, 0, 500), 1000 + 300 * 10 + 500)
+assert.equal(L.scoreFor(120, 3, 2, 100), 1000 + 180 * 10 + 300 + 300 + 100)
+
 console.log('logic tests: all passed')

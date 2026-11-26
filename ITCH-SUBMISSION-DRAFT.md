@@ -26,6 +26,8 @@ weakness to discover.
   circles.
 - Shardlings: small crystal minions spawn through the fight and chase you.
   Click them to smash: +100 score, +10 HP.
+- Combo: hits chained without taking damage build a combo — every 5 hits
+  raises the score multiplier (up to x4). Taking a hit resets it.
 - Goal: defeat the Crystal Golem (300 HP) in under 5 minutes.
 - Ground Slam: a red circle appears where you stand — get out before it
   detonates.

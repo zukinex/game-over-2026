@@ -82,10 +82,31 @@ export function allSpikesBroken(brokenCount: number): boolean {
   return brokenCount >= SPIKE_COUNT
 }
 
-/** Final score: win bonus + time bonus + shard score + spike score. */
-export function scoreFor(secondsElapsed: number, shardsSmashed: number, spikesBroken = 0): number {
+/** Final score: win bonus + time bonus + shard score + spike score + hit score. */
+export function scoreFor(
+  secondsElapsed: number,
+  shardsSmashed: number,
+  spikesBroken = 0,
+  hitScore = 0
+): number {
   const timeBonus = Math.max(0, FIGHT_TIME_LIMIT_S - Math.floor(secondsElapsed)) * TIME_BONUS_PER_SECOND
-  return WIN_BONUS + timeBonus + shardsSmashed * SHARD_SCORE + spikesBroken * SPIKE_SCORE
+  return WIN_BONUS + timeBonus + shardsSmashed * SHARD_SCORE + spikesBroken * SPIKE_SCORE + hitScore
+}
+
+// ------------------------------------------------------------------ combo
+/** Hits per combo tier: every 5 consecutive hits raises the multiplier. */
+export const COMBO_STEP = 5
+/** Highest score multiplier a combo can reach. */
+export const COMBO_MAX_MULTIPLIER = 4
+
+/** Score multiplier from the current combo count: x1, then +1 every 5 hits, capped at x4. */
+export function comboMultiplier(combo: number): number {
+  return Math.min(COMBO_MAX_MULTIPLIER, 1 + Math.floor(Math.max(0, combo) / COMBO_STEP))
+}
+
+/** Score for one boss hit of `damage` at the current combo (counted before this hit). */
+export function hitScoreFor(damage: number, combo: number): number {
+  return damage * comboMultiplier(combo)
 }
 
 /** "M:SS" timer format. */

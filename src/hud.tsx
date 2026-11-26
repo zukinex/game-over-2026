@@ -72,6 +72,24 @@ const hudComponent = () => (
       />
     </UiEntity>
 
+    {/* Combo — visible once the multiplier kicks in (5+ hits) */}
+    {hudState.phase === 'fight' && hudState.comboMult > 1 ? (
+      <UiEntity
+        uiTransform={{ width: 520, height: 30, margin: '8px 0 0 0', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+        uiBackground={{ color: Color4.create(0, 0, 0, 0.45) }}
+      >
+        <Label
+          value={`Combo x${hudState.comboMult} — ${hudState.combo} hits`}
+          fontSize={17}
+          color={Color4.fromHexString('#facc15')}
+          textAlign="middle-center"
+          uiTransform={{ width: 520, height: 24 }}
+        />
+      </UiEntity>
+    ) : (
+      <UiEntity uiTransform={{ width: 520, height: 30, margin: '8px 0 0 0' }} />
+    )}
+
     {/* Charge bar — visible while holding the golem */}
     {hudState.phase === 'fight' && hudState.charge > 0 ? (
       <UiEntity
@@ -123,6 +141,7 @@ const hudComponent = () => (
         <Label value="Click the golem to attack — hold to charge a heavy blow." fontSize={17} color={Color4.White()} textAlign="middle-center" uiTransform={{ width: 520, height: 26 }} />
         <Label value="Press F or tap DODGE to dash away from its attacks." fontSize={17} color={Color4.White()} textAlign="middle-center" uiTransform={{ width: 520, height: 26 }} />
         <Label value="Smash the shardlings to heal. Defeat it in under 5 minutes." fontSize={17} color={Color4.White()} textAlign="middle-center" uiTransform={{ width: 520, height: 26 }} />
+        <Label value="Chain hits without taking damage to build a combo — bigger combo, bigger score." fontSize={17} color={Color4.fromHexString('#facc15')} textAlign="middle-center" uiTransform={{ width: 520, height: 26 }} />
         <Button
           uiTransform={{ width: 220, height: 56, margin: '20px 0 0 0' }}
           value="START FIGHT"
@@ -145,6 +164,7 @@ const hudComponent = () => (
         <Label value="and your name is etched in crystal." fontSize={16} color={Color4.create(0.85, 0.9, 1, 1)} textAlign="middle-center" uiTransform={{ width: 520, height: 24 }} />
         <Label value={`Time: ${formatTime(hudState.timeS)}`} fontSize={20} color={Color4.White()} textAlign="middle-center" uiTransform={{ width: 520, height: 30 }} />
         <Label value={`Score: ${hudState.score}`} fontSize={20} color={Color4.White()} textAlign="middle-center" uiTransform={{ width: 520, height: 30 }} />
+        <Label value={`Best combo: ${hudState.bestCombo} hits`} fontSize={16} color={Color4.create(0.8, 0.8, 0.8, 1)} textAlign="middle-center" uiTransform={{ width: 520, height: 26 }} />
         <Label value={`Shardlings smashed: ${hudState.shardsSmashed}`} fontSize={16} color={Color4.create(0.8, 0.8, 0.8, 1)} textAlign="middle-center" uiTransform={{ width: 520, height: 26 }} />
         <Label value={`Spikes shattered: ${hudState.spikesBroken} / 2`} fontSize={16} color={Color4.create(0.8, 0.8, 0.8, 1)} textAlign="middle-center" uiTransform={{ width: 520, height: 26 }} />
         <Button

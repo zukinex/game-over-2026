@@ -54,7 +54,9 @@ import {
   shardlingSpawnIntervalS,
   allSpikesBroken,
   clampHp,
+  comboMultiplier,
   distanceXZ,
+  hitScoreFor,
   insideSlamDisc,
   isTimeUp,
   scoreFor
@@ -71,6 +73,9 @@ export const hudState: {
   playerMax: number
   timeS: number
   score: number
+  combo: number
+  comboMult: number
+  bestCombo: number
   shardsSmashed: number
   spikesBroken: number
   charge: number
@@ -86,6 +91,9 @@ export const hudState: {
   playerMax: PLAYER_MAX_HP,
   timeS: 0,
   score: 0,
+  combo: 0,
+  comboMult: 1,
+  bestCombo: 0,
   shardsSmashed: 0,
   spikesBroken: 0,
   charge: 0,
@@ -110,6 +118,10 @@ let hitFlashT = 0
 let bannerUntil = 0
 let shardsSmashed = 0
 let spikesBroken = 0
+// Combo (v5): consecutive boss hits without taking damage.
+let combo = 0
+let hitScore = 0
+let bestCombo = 0
 let coreExposed = false
 let spikeHp: number[] = [SPIKE_MAX_HP, SPIKE_MAX_HP]
 let spikeFlashT: number[] = [0, 0]
@@ -149,6 +161,10 @@ let bossChestCore: Entity = NO_ENTITY
 let bossHead: Entity = NO_ENTITY
 let bossArmPivotL: Entity = NO_ENTITY
 let bossArmPivotR: Entity = NO_ENTITY
+let bossArmL: Entity = NO_ENTITY
+let bossArmR: Entity = NO_ENTITY
+let bossLegL: Entity = NO_ENTITY
+let bossLegR: Entity = NO_ENTITY
 let bossHitbox: Entity = NO_ENTITY
 let bossSpike1: Entity = NO_ENTITY
 let bossSpike2: Entity = NO_ENTITY
@@ -179,13 +195,17 @@ function syncHud() {
   hudState.dodgeCooldown = Math.max(0, lastDodgeAt + DODGE_COOLDOWN_S - timeS)
   hudState.dodging = dodgeActive(dodgeUntil, timeS)
   hudState.score =
-    state === 'victory' ? scoreFor(timeS, shardsSmashed, spikesBroken) : hudState.score
+    state === 'victory' ? scoreFor(timeS, shardsSmashed, spikesBroken, hitScore) : hitScore
+  hudState.combo = combo
+  hudState.comboMult = comboMultiplier(combo)
+  hudState.bestCombo = bestCombo
 }
 
 function damagePlayer(amount: number) {
   if (state !== 'fight') return
   if (dodgeActive(dodgeUntil, timeS)) return // dodging: the hit whiffs
   playerHp = clampHp(playerHp - amount, PLAYER_MAX_HP)
+  combo = 0 // taking a hit breaks the combo
   if (playerHp <= 0) {
     chargeStartAt = -1
     state = 'defeat'
@@ -200,6 +220,10 @@ function damageBoss(amount: number) {
   if (state !== 'fight') return
   const prevPhase = phaseForHp(bossHp)
   bossHp = clampHp(bossHp - amount, BOSS_MAX_HP)
+  // Combo: this hit scores at the current multiplier, then raises the combo.
+  hitScore += hitScoreFor(amount, combo)
+  combo += 1
+  bestCombo = Math.max(bestCombo, combo)
   hitFlashT = 0.15
   const nextPhase = phaseForHp(bossHp)
   if (nextPhase !== prevPhase) {
@@ -324,6 +348,9 @@ export function resetFight() {
   dyingT = 0
   shardsSmashed = 0
   spikesBroken = 0
+  combo = 0
+  hitScore = 0
+  bestCombo = 0
   coreExposed = false
   spikeHp = [SPIKE_MAX_HP, SPIKE_MAX_HP]
   spikeFlashT = [0, 0]
@@ -708,6 +735,56 @@ export function setupGame() {
   bossSpike1 = fetchEntity(EntityNames.BossSpike1)
   bossSpike2 = fetchEntity(EntityNames.BossSpike2)
   bossSpike3 = fetchEntity(EntityNames.BossSpike3)
+  bossArmL = fetchEntity(EntityNames.BossArmL)
+  bossArmR = fetchEntity(EntityNames.BossArmR)
+  bossLegL = fetchEntity(EntityNames.BossLegL)
+  bossLegR = fetchEntity(EntityNames.BossLegR)
+
+  // V5: lighten the golem's stone so it reads against the night sky.
+  // The body material comes from the composite (near-black); override it
+  // once here with light grey stone + a faint cool glow.
+  const stone = Color4.fromHexString('#9aa0a6')
+  const stoneGlow = Color4.fromHexString('#2e3440')
+  for (const e of [bossTorso, bossHead, bossArmL, bossArmR, bossLegL, bossLegR]) {
+    if (!e || e === NO_ENTITY) continue
+    Material.setPbrMaterial(e, {
+      albedoColor: stone,
+      emissiveColor: stoneGlow,
+      emissiveIntensity: 0.5,
+      roughness: 0.9,
+      metallic: 0.05
+    })
+  }
+
+  // V5: permanent glowing rune ring under the golem — marks the boss arena.
+  const ringOuter = engine.addEntity()
+  Transform.create(ringOuter, {
+    position: { x: BOSS_ROOT_POS.x, y: 0.06, z: BOSS_ROOT_POS.z },
+    scale: { x: 1, y: 0.05, z: 1 }
+  })
+  MeshRenderer.setCylinder(ringOuter, 3.5, 3.5)
+  Material.setPbrMaterial(ringOuter, {
+    albedoColor: Color4.create(0.96, 0.62, 0.04, 0.35),
+    emissiveColor: Color4.fromHexString('#f59e0b'),
+    emissiveIntensity: 1.2,
+    roughness: 1,
+    metallic: 0,
+    transparencyMode: MaterialTransparencyMode.MTM_ALPHA_BLEND
+  })
+  const ringInner = engine.addEntity()
+  Transform.create(ringInner, {
+    position: { x: BOSS_ROOT_POS.x, y: 0.07, z: BOSS_ROOT_POS.z },
+    scale: { x: 1, y: 0.05, z: 1 }
+  })
+  MeshRenderer.setCylinder(ringInner, 2.2, 2.2)
+  Material.setPbrMaterial(ringInner, {
+    albedoColor: Color4.create(0.13, 0.83, 0.93, 0.3),
+    emissiveColor: Color4.fromHexString('#22d3ee'),
+    emissiveIntensity: 1,
+    roughness: 1,
+    metallic: 0,
+    transparencyMode: MaterialTransparencyMode.MTM_ALPHA_BLEND
+  })
   flames = [
     fetchEntity(EntityNames.TorchFlame1),
     fetchEntity(EntityNames.TorchFlame2),
