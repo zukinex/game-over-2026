@@ -142,6 +142,7 @@ const hudComponent = () => (
         <Label value="Press F or tap DODGE to dash away from its attacks." fontSize={17} color={Color4.White()} textAlign="middle-center" uiTransform={{ width: 520, height: 26 }} />
         <Label value="Smash the shardlings to heal. Defeat it in under 5 minutes." fontSize={17} color={Color4.White()} textAlign="middle-center" uiTransform={{ width: 520, height: 26 }} />
         <Label value="Chain hits without taking damage to build a combo — bigger combo, bigger score." fontSize={17} color={Color4.fromHexString('#facc15')} textAlign="middle-center" uiTransform={{ width: 520, height: 26 }} />
+        <Label value="Music: Five Armies — Kevin MacLeod (CC-BY 4.0)" fontSize={13} color={Color4.create(0.7, 0.7, 0.7, 1)} textAlign="middle-center" uiTransform={{ width: 520, height: 20 }} />
         <Button
           uiTransform={{ width: 220, height: 56, margin: '20px 0 0 0' }}
           value="START FIGHT"

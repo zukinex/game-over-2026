@@ -56,8 +56,10 @@ Deploy target: a World assigned by DCL Regenesis Labs for the jam
 
 ## Credits
 
-- Music: "Five Armies" by Kevin MacLeod (incompetech.com), licensed CC-BY 4.0
-  (trimmed to a 60-second loop, `assets/Audio/music.mp3`).
+- Music: "Five Armies" by Kevin MacLeod (incompetech.com),
+  licensed under Creative Commons: By Attribution 4.0
+  (https://creativecommons.org/licenses/by/4.0/),
+  trimmed to a 60-second loop (`assets/Audio/music.mp3`).
 
 ## License
 

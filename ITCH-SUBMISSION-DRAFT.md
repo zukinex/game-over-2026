@@ -60,7 +60,9 @@ https://github.com/zukinex/game-over-2026 (MIT license)
 - Built with Decentraland SDK 7.
 - All 3D content is SDK primitives + emissive materials made for this jam;
   no third-party models or textures.
-- Music: "Five Armies" by Kevin MacLeod (incompetech.com), CC-BY 4.0,
+- Music: "Five Armies" by Kevin MacLeod (incompetech.com),
+  licensed under Creative Commons: By Attribution 4.0
+  (https://creativecommons.org/licenses/by/4.0/),
   trimmed to a 60-second loop.
 - Fonts/UI: Decentraland default.
 

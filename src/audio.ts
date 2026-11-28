@@ -52,6 +52,9 @@ let ready = false
 
 // Background music (v6): "Five Armies" by Kevin MacLeod (incompetech.com),
 // licensed CC-BY 4.0 — credit in README.md + the itch.io submission.
+// Full credit format per Incompetech's FAQ: title, "Kevin MacLeod
+// (incompetech.com)", "Licensed under Creative Commons: By Attribution 4.0",
+// https://creativecommons.org/licenses/by/4.0/
 // Trimmed to a 60 s loop with ffmpeg (2 s fades) to keep the scene light:
 // assets/Audio/music.mp3 is 0.7 MB vs 6.2 MB for the full track.
 const MUSIC_FILE = 'assets/Audio/music.mp3'
