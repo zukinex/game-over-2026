@@ -11,10 +11,10 @@ attack, dodge its telegraphed attacks, and kill it in under 5 minutes.
 
 - **Click / tap the golem** to attack (10 damage per hit).
 - **Ground Slam** — a red circle appears where you stand. Get out before it
-  detonates (20 damage).
+  detonates (15 damage).
 - **Crystal Volley** — the golem fires a spread of crystals (10 damage each).
 - **Summon Shards** (final phase) — small shards chase you. Click them to
-  smash: +100 score, +5 HP.
+  smash: +100 score, +10 HP.
 - **3 phases**: the golem gets faster and angrier as its HP drops
   (300 → 200 → 100), turning magenta in the final phase.
 - **Win**: boss HP 0. **Lose**: your HP 0. Score = win bonus + time bonus +
@@ -53,6 +53,11 @@ Deploy target: a World assigned by DCL Regenesis Labs for the jam
 - `npm run build` — type-check + bundle (must exit 0).
 - `node tools/test-logic.mjs` — pure-logic unit tests.
 - `node tools/verify-composite.mjs` — composite integrity check.
+
+## Credits
+
+- Music: "Five Armies" by Kevin MacLeod (incompetech.com), licensed CC-BY 4.0
+  (trimmed to a 60-second loop, `assets/Audio/music.mp3`).
 
 ## License
 

@@ -116,4 +116,12 @@ assert.equal(L.hitScoreFor(25, 10), 75)
 assert.equal(L.scoreFor(0, 0, 0, 500), 1000 + 300 * 10 + 500)
 assert.equal(L.scoreFor(120, 3, 2, 100), 1000 + 180 * 10 + 300 + 300 + 100)
 
+// Golem movement (v6): slow walk toward the player, stopping a few metres out.
+assert.deepEqual(L.stepToward(0, 0, 10, 0, 3), { x: 3, z: 0 })
+assert.deepEqual(L.stepToward(0, 0, 2, 0, 3), { x: 2, z: 0 }) // never overshoots
+assert.deepEqual(L.stepToward(5, 5, 5, 5, 3), { x: 5, z: 5 }) // already there
+assert.deepEqual(L.stepToward(0, 0, 10, 0, 0), { x: 0, z: 0 })
+assert.equal(L.GOLEM_WALK_SPEED, 0.6)
+assert.equal(L.GOLEM_STOP_DISTANCE, 3)
+
 console.log('logic tests: all passed')

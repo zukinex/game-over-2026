@@ -50,6 +50,16 @@ const CLIPS: { name: SfxName; file: string; volume: number; pitchJitter?: number
 const entities = new Map<SfxName, Entity>()
 let ready = false
 
+// Background music (v6): "Five Armies" by Kevin MacLeod (incompetech.com),
+// licensed CC-BY 4.0 — credit in README.md + the itch.io submission.
+// Trimmed to a 60 s loop with ffmpeg (2 s fades) to keep the scene light:
+// assets/Audio/music.mp3 is 0.7 MB vs 6.2 MB for the full track.
+const MUSIC_FILE = 'assets/Audio/music.mp3'
+const MUSIC_VOLUME = 0.25
+let musicEntity: Entity | null = null
+let musicStarted = false
+let musicMuted = false
+
 /** Create one silent AudioSource entity per cue. Call once from setupGame. */
 export function initAudio() {
   if (ready) return
@@ -66,7 +76,37 @@ export function initAudio() {
     })
     entities.set(clip.name, e)
   }
+  // Music: one looped source, started on START FIGHT (after the click, so
+  // the browser autoplay policy is satisfied).
+  musicEntity = engine.addEntity()
+  Transform.create(musicEntity, { position: { x: 16, y: 2, z: 16 } })
+  AudioSource.create(musicEntity, {
+    audioClipUrl: MUSIC_FILE,
+    playing: false,
+    loop: true,
+    volume: MUSIC_VOLUME,
+    global: true
+  })
   ready = true
+}
+
+/** Start the music loop. Safe to call repeatedly (starts once). */
+export function startMusic() {
+  if (!musicEntity || musicStarted) return
+  musicStarted = true
+  AudioSource.playSound(musicEntity, MUSIC_FILE)
+}
+
+/** Mute/unmute via volume (never touches the `playing` flag). */
+export function setMusicMuted(muted: boolean) {
+  musicMuted = muted
+  if (!musicEntity) return
+  const src = AudioSource.getMutableOrNull(musicEntity)
+  if (src) src.volume = muted ? 0 : MUSIC_VOLUME
+}
+
+export function isMusicMuted(): boolean {
+  return musicMuted
 }
 
 /** Play a cue from the start. Safe to call before initAudio (no-op). */

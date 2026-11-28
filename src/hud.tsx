@@ -4,7 +4,7 @@
 // Creator Hub UI Designer never rewrites it.
 import ReactEcs, { Button, Label, ReactEcsRenderer, UiEntity } from '@dcl/sdk/react-ecs'
 import { Color4 } from '@dcl/sdk/math'
-import { hudState, startFight, resetFight, tryDodge } from './game'
+import { hudState, startFight, resetFight, tryDodge, toggleMusic } from './game'
 import { formatTime } from './logic'
 
 const BOSS_BAR_W = 480
@@ -66,7 +66,7 @@ const hudComponent = () => (
       <Label
         value={`${formatTime(hudState.timeS)} / 5:00`}
         fontSize={18}
-        color={Color4.White()}
+        color={hudState.timeS >= 240 ? Color4.fromHexString('#ef4444') : Color4.White()}
         textAlign="middle-right"
         uiTransform={{ width: 130, height: 30, margin: '0 12px 0 0' }}
       />
@@ -208,6 +208,27 @@ const hudComponent = () => (
           onMouseDown={() => tryDodge()}
         />
       </UiEntity>
+    )}
+
+    {/* v6: music mute — bottom-left, works on desktop + mobile */}
+    {hudState.phase === 'fight' && (
+      <UiEntity uiTransform={{ positionType: 'absolute', position: { left: 24, bottom: 24 } }}>
+        <Button
+          uiTransform={{ width: 180, height: 60 }}
+          value={hudState.musicMuted ? 'MUSIC OFF' : 'MUSIC ON'}
+          variant="secondary"
+          fontSize={20}
+          onMouseDown={() => toggleMusic()}
+        />
+      </UiEntity>
+    )}
+
+    {/* v6: red hurt flash — full-screen overlay while hurtFlash decays */}
+    {hudState.hurtFlash > 0 && (
+      <UiEntity
+        uiTransform={{ positionType: 'absolute', position: { left: 0, top: 0 }, width: '100%', height: '100%' }}
+        uiBackground={{ color: Color4.create(1, 0, 0, Math.min(0.3, hudState.hurtFlash * 0.75)) }}
+      />
     )}
   </UiEntity>
 )

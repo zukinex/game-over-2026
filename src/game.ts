@@ -16,22 +16,31 @@ import {
   InputAction,
   inputSystem,
   pointerEventsSystem,
-  ColliderLayer
+  ColliderLayer,
+  TextShape,
+  Billboard,
+  AvatarAttach,
+  AvatarAnchorPointType
 } from '@dcl/sdk/ecs'
 import type { Entity } from '@dcl/sdk/ecs'
 import { Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
 import { movePlayerTo } from '~system/RestrictedActions'
 import { EntityNames } from '../assets/scene/entity-names'
-import { initAudio, playSfx } from './audio'
+import { initAudio, playSfx, startMusic, setMusicMuted, isMusicMuted } from './audio'
 import {
   BOSS_MAX_HP,
   PLAYER_MAX_HP,
   PLAYER_ATTACK_DAMAGE,
   PLAYER_ATTACK_COOLDOWN_S,
+  FIGHT_TIME_LIMIT_S,
   HEAVY_COOLDOWN_S,
   DODGE_IFRAMES_S,
   DODGE_COOLDOWN_S,
   DODGE_DISTANCE,
+  GOLEM_WALK_SPEED,
+  GOLEM_STOP_DISTANCE,
+  ARENA_MIN,
+  ARENA_MAX,
   SHARDLING_MAX_ALIVE,
   SHARDLING_FIRST_SPAWN_S,
   SPIKE_COUNT,
@@ -51,6 +60,7 @@ import {
   dodgeReady,
   dodgeActive,
   dashTarget,
+  stepToward,
   shardlingSpawnIntervalS,
   allSpikesBroken,
   clampHp,
@@ -83,6 +93,10 @@ export const hudState: {
   dodgeCooldown: number
   dodging: boolean
   banner: string | null
+  /** Red hurt-flash strength, 0..HURT_FLASH_TIME (v6). */
+  hurtFlash: number
+  /** True while the music is muted (v6). */
+  musicMuted: boolean
 } = {
   phase: 'intro',
   bossHp: BOSS_MAX_HP,
@@ -100,7 +114,9 @@ export const hudState: {
   heavyReady: true,
   dodgeCooldown: 0,
   dodging: false,
-  banner: null
+  banner: null,
+  hurtFlash: 0,
+  musicMuted: false
 }
 
 // ------------------------------------------------------------------- state
@@ -138,6 +154,25 @@ let shardlingBannerShown = false
 // hides behind the head, so it stays visual-only.
 let breakableSpikes: Entity[] = []
 
+// v6: red hurt flash (decays like hitFlashT) + 1-minute warning flag.
+const HURT_FLASH_TIME = 0.4
+let hurtFlashT = 0
+let timeWarningShown = false
+// v6: golem stagger — a decaying shove away from the player on each hit.
+const STAGGER_TIME = 0.25
+const STAGGER_DISTANCE = 0.35
+let staggerT = 0
+let staggerX = 0
+let staggerZ = 0
+// v6: floating damage numbers — a small reused pool of billboarded texts.
+type DamageNumber = { entity: Entity; t: number; life: number; color: Color4 }
+const DAMAGE_NUMBER_POOL = 8
+const DAMAGE_NUMBER_LIFE = 0.9
+const dmgNumbers: DamageNumber[] = []
+// v6: crystal sword in the player's right hand (AvatarAttach) + swing state.
+let swingT = 0
+let swingHeavy = false
+
 const SLAM_RADIUS = 2.5
 const SLAM_TELEGRAPH_S = 1.2
 const PROJECTILE_SPEED = 8
@@ -171,11 +206,76 @@ let bossSpike2: Entity = NO_ENTITY
 let bossSpike3: Entity = NO_ENTITY
 let flames: Entity[] = []
 
+// v6: the rune ring follows the golem once it starts walking.
+let ringOuter: Entity = NO_ENTITY
+let ringInner: Entity = NO_ENTITY
+// v6: crystal sword in the player's right hand (AvatarAttach).
+let weaponAnchor: Entity = NO_ENTITY
+let weaponPivot: Entity = NO_ENTITY
+let weaponVisible = false
+
 // ------------------------------------------------------------------ helpers
 function playerXZ(): { x: number; z: number } | null {
   const t = Transform.getOrNull(engine.PlayerEntity)
   if (!t) return null
   return { x: t.position.x, z: t.position.z }
+}
+
+/** Live golem position (it walks in v6, so the static spawn no longer suffices). */
+function bossPos(): { x: number; z: number } {
+  const t = bossRoot !== NO_ENTITY ? Transform.getOrNull(bossRoot) : null
+  return t ? { x: t.position.x, z: t.position.z } : { x: BOSS_ROOT_POS.x, z: BOSS_ROOT_POS.z }
+}
+
+/** Music mute toggle for the HUD button. */
+export function toggleMusic() {
+  setMusicMuted(!isMusicMuted())
+  syncHud()
+}
+
+// ------------------------------------------------------------------ damage numbers (v6)
+/** Show a floating damage number above the golem's chest. Heavy hits (>= 25) read gold. */
+function spawnDamageNumber(amount: number) {
+  let slot = dmgNumbers.find((d) => d.t <= 0) ?? dmgNumbers[0]
+  if (!slot) return
+  const heavy = amount >= 25
+  const bp = bossPos()
+  const e = slot.entity
+  slot.t = DAMAGE_NUMBER_LIFE
+  slot.life = DAMAGE_NUMBER_LIFE
+  slot.color = heavy ? Color4.fromHexString('#f59e0b') : Color4.White()
+  const t = Transform.getMutableOrNull(e)
+  if (t) {
+    t.position = {
+      x: bp.x + (Math.random() - 0.5) * 1.4,
+      y: 3.4 + Math.random() * 0.5,
+      z: bp.z + (Math.random() - 0.5) * 1.4
+    }
+  }
+  TextShape.createOrReplace(e, {
+    text: `${amount}`,
+    fontSize: heavy ? 4 : 3,
+    textColor: slot.color,
+    width: 4,
+    height: 1
+  })
+  VisibilityComponent.createOrReplace(e, { visible: true })
+}
+
+/** Float active damage numbers upward and fade them out. */
+function damageNumberSystem(dt: number) {
+  for (const d of dmgNumbers) {
+    if (d.t <= 0) continue
+    d.t = Math.max(0, d.t - dt)
+    const t = Transform.getMutableOrNull(d.entity)
+    if (t) t.position.y += 1.4 * dt
+    const alpha = d.life > 0 ? d.t / d.life : 0
+    const shape = TextShape.getMutableOrNull(d.entity)
+    if (shape) {
+      shape.textColor = Color4.create(d.color.r, d.color.g, d.color.b, alpha)
+    }
+    if (d.t <= 0) VisibilityComponent.createOrReplace(d.entity, { visible: false })
+  }
 }
 
 function showBanner(text: string, seconds = 2.5) {
@@ -199,6 +299,8 @@ function syncHud() {
   hudState.combo = combo
   hudState.comboMult = comboMultiplier(combo)
   hudState.bestCombo = bestCombo
+  hudState.hurtFlash = hurtFlashT
+  hudState.musicMuted = isMusicMuted()
 }
 
 function damagePlayer(amount: number) {
@@ -206,6 +308,7 @@ function damagePlayer(amount: number) {
   if (dodgeActive(dodgeUntil, timeS)) return // dodging: the hit whiffs
   playerHp = clampHp(playerHp - amount, PLAYER_MAX_HP)
   combo = 0 // taking a hit breaks the combo
+  hurtFlashT = HURT_FLASH_TIME // v6: red flash so the hit is impossible to miss
   if (playerHp <= 0) {
     chargeStartAt = -1
     state = 'defeat'
@@ -225,6 +328,19 @@ function damageBoss(amount: number) {
   combo += 1
   bestCombo = Math.max(bestCombo, combo)
   hitFlashT = 0.15
+  spawnDamageNumber(amount) // v6: floating damage number
+  // v6: stagger — shove the golem away from the player, decaying fast.
+  staggerT = STAGGER_TIME
+  const bp = bossPos()
+  const pp = playerXZ()
+  if (pp) {
+    const len = Math.max(0.01, Math.hypot(bp.x - pp.x, bp.z - pp.z))
+    staggerX = ((bp.x - pp.x) / len) * STAGGER_DISTANCE
+    staggerZ = ((bp.z - pp.z) / len) * STAGGER_DISTANCE
+  } else {
+    staggerX = 0
+    staggerZ = 0
+  }
   const nextPhase = phaseForHp(bossHp)
   if (nextPhase !== prevPhase) {
     playSfx('phase')
@@ -326,7 +442,11 @@ export function startFight() {
   attackIndex = 0
   lastPlayerAttackAt = -1
   shardlingTimer = SHARDLING_FIRST_SPAWN_S
+  timeWarningShown = false
+  staggerT = 0
+  hurtFlashT = 0
   playSfx('start')
+  startMusic()
   showBanner('The Crystal Golem awakens!')
   syncHud()
 }
@@ -355,6 +475,13 @@ export function resetFight() {
   spikeHp = [SPIKE_MAX_HP, SPIKE_MAX_HP]
   spikeFlashT = [0, 0]
   hitFlashT = 0
+  timeWarningShown = false
+  staggerT = 0
+  hurtFlashT = 0
+  for (const d of dmgNumbers) {
+    d.t = 0
+    VisibilityComponent.createOrReplace(d.entity, { visible: false })
+  }
   // Restore the boss: visible, upright, facing the spawn (-Z).
   if (bossRoot) {
     VisibilityComponent.createOrReplace(bossRoot, { visible: true })
@@ -382,6 +509,7 @@ export function resetFight() {
   }
   state = 'fight'
   playSfx('start')
+  startMusic()
   showBanner('Round two — the Golem awakens!')
   syncHud()
 }
@@ -419,7 +547,8 @@ export function tryDodge() {
   lastDodgeAt = timeS
   dodgeUntil = timeS + DODGE_IFRAMES_S
   playSfx('dodge')
-  const target = dashTarget(p.x, p.z, p.x - BOSS_ROOT_POS.x, p.z - BOSS_ROOT_POS.z, DODGE_DISTANCE)
+  const bp = bossPos()
+  const target = dashTarget(p.x, p.z, p.x - bp.x, p.z - bp.z, DODGE_DISTANCE)
   void movePlayerTo({ newRelativePosition: Vector3.create(target.x, 0, target.z), duration: 0.15 })
   syncHud()
 }
@@ -509,6 +638,8 @@ function bossAnimSystem(dt: number) {
   clock += dt
   if (hudState.banner && clock > bannerUntil) hudState.banner = null
   if (hitFlashT > 0) hitFlashT = Math.max(0, hitFlashT - dt)
+  if (hurtFlashT > 0) hurtFlashT = Math.max(0, hurtFlashT - dt)
+  if (staggerT > 0) staggerT = Math.max(0, staggerT - dt)
 
   // Torch flames flicker.
   for (let i = 0; i < flames.length; i++) {
@@ -580,10 +711,43 @@ function bossAnimSystem(dt: number) {
     rootT.rotation = Quaternion.fromAngleAxis(bossYaw + dyingT * 3, Vector3.Up())
     return
   }
+  // v6: walk toward the player between attacks (plants its feet while a
+  // slam telegraph is active), plus the decaying stagger shove from hits.
+  let nx = rootT.position.x
+  let nz = rootT.position.z
+  if (state === 'fight' && !telegraph) {
+    const pp = playerXZ()
+    if (pp) {
+      const d = distanceXZ(nx, nz, pp.x, pp.z)
+      if (d > GOLEM_STOP_DISTANCE) {
+        const next = stepToward(nx, nz, pp.x, pp.z, GOLEM_WALK_SPEED * dt)
+        nx = next.x
+        nz = next.z
+      }
+    }
+  }
+  if (staggerT > 0) {
+    const k = staggerT / STAGGER_TIME
+    nx += staggerX * k
+    nz += staggerZ * k
+  }
+  nx = Math.max(ARENA_MIN, Math.min(ARENA_MAX, nx))
+  nz = Math.max(ARENA_MIN, Math.min(ARENA_MAX, nz))
+  rootT.position.x = nx
+  rootT.position.z = nz
   // Idle bob — big and visible from across the arena (playtest 2026-11-26:
   // the golem read as frozen with a 0.06 bob on a 4.5 m body).
   rootT.position.y = BOSS_ROOT_POS.y + Math.sin(clock * 1.5) * 0.18
   rootT.rotation = Quaternion.fromAngleAxis(bossYaw, Vector3.Up())
+  // v6: the rune ring follows the golem now that it walks.
+  for (const ring of [ringOuter, ringInner]) {
+    if (ring === NO_ENTITY) continue
+    const rt = Transform.getMutableOrNull(ring)
+    if (rt) {
+      rt.position.x = nx
+      rt.position.z = nz
+    }
+  }
 
   // Arms: raise during the slam telegraph, else hang with a wide sway.
   const raise = telegraph ? Math.min(1, telegraph.t / 0.35) : 0
@@ -608,11 +772,36 @@ function bossAnimSystem(dt: number) {
       Vector3.Up()
     )
   }
+
+  // v6: crystal sword — visible only during the fight, swings on attack.
+  const wantWeapon = state === 'fight'
+  if (wantWeapon !== weaponVisible) {
+    weaponVisible = wantWeapon
+    if (weaponAnchor !== NO_ENTITY) {
+      VisibilityComponent.createOrReplace(weaponAnchor, { visible: wantWeapon })
+    }
+  }
+  if (swingT > 0 && weaponPivot !== NO_ENTITY) {
+    swingT = Math.max(0, swingT - dt)
+    const dur = swingHeavy ? 0.35 : 0.25
+    const progress = Math.min(1, 1 - swingT / dur)
+    const arc = (swingHeavy ? 2.0 : 1.4) * Math.sin(progress * Math.PI)
+    Transform.getMutable(weaponPivot).rotation = Quaternion.fromAngleAxis(
+      -0.5 + arc,
+      Vector3.Right()
+    )
+  }
 }
 
 function fightSystem(dt: number) {
   if (state === 'fight') {
     timeS += dt
+    // v6: one warning at 1 minute left — a timeout loss should never surprise.
+    if (!timeWarningShown && timeS >= FIGHT_TIME_LIMIT_S - 60) {
+      timeWarningShown = true
+      showBanner("1 minute left! Finish it!", 3)
+      playSfx('phase')
+    }
     if (isTimeUp(timeS)) {
       // Hard 5-minute limit (jam rules): the fight ends, win or lose.
       state = 'defeat'
@@ -757,7 +946,8 @@ export function setupGame() {
   }
 
   // V5: permanent glowing rune ring under the golem — marks the boss arena.
-  const ringOuter = engine.addEntity()
+  // v6: stored in module vars so the ring follows the golem once it walks.
+  ringOuter = engine.addEntity()
   Transform.create(ringOuter, {
     position: { x: BOSS_ROOT_POS.x, y: 0.06, z: BOSS_ROOT_POS.z },
     scale: { x: 1, y: 0.05, z: 1 }
@@ -771,7 +961,7 @@ export function setupGame() {
     metallic: 0,
     transparencyMode: MaterialTransparencyMode.MTM_ALPHA_BLEND
   })
-  const ringInner = engine.addEntity()
+  ringInner = engine.addEntity()
   Transform.create(ringInner, {
     position: { x: BOSS_ROOT_POS.x, y: 0.07, z: BOSS_ROOT_POS.z },
     scale: { x: 1, y: 0.05, z: 1 }
@@ -785,6 +975,54 @@ export function setupGame() {
     metallic: 0,
     transparencyMode: MaterialTransparencyMode.MTM_ALPHA_BLEND
   })
+
+  // v6: glowing crystals + rocks around the arena edges (primitives only).
+  // No colliders: decoration at the edges, never in the fight's way.
+  const crystalSpots: { x: number; z: number; h: number; color: string; tilt: number }[] = [
+    { x: 4, z: 4, h: 2.2, color: '#22d3ee', tilt: 0.12 },
+    { x: 28, z: 4, h: 1.8, color: '#f59e0b', tilt: -0.1 },
+    { x: 4, z: 28, h: 2.6, color: '#22d3ee', tilt: -0.14 },
+    { x: 28, z: 28, h: 1.6, color: '#e879f9', tilt: 0.1 },
+    { x: 4, z: 16, h: 1.4, color: '#f59e0b', tilt: 0.08 },
+    { x: 28, z: 16, h: 2.0, color: '#22d3ee', tilt: -0.12 }
+  ]
+  for (const s of crystalSpots) {
+    const e = engine.addEntity()
+    Transform.create(e, {
+      position: { x: s.x, y: s.h / 2, z: s.z },
+      rotation: Quaternion.fromAngleAxis(s.tilt, Vector3.Right()),
+      scale: { x: 1, y: s.h, z: 1 }
+    })
+    MeshRenderer.setCylinder(e, 0.06, 0.5)
+    Material.setPbrMaterial(e, {
+      albedoColor: Color4.fromHexString(s.color),
+      emissiveColor: Color4.fromHexString(s.color),
+      emissiveIntensity: 1.8,
+      roughness: 0.2,
+      metallic: 0.1
+    })
+  }
+  const rockSpots: { x: number; z: number; s: number }[] = [
+    { x: 7, z: 27, s: 1.2 },
+    { x: 25, z: 5, s: 0.9 },
+    { x: 26, z: 22, s: 1.4 }
+  ]
+  for (const s of rockSpots) {
+    const e = engine.addEntity()
+    Transform.create(e, {
+      position: { x: s.x, y: (s.s * 0.7) / 2, z: s.z },
+      rotation: Quaternion.fromAngleAxis(0.5, Vector3.Up()),
+      scale: { x: s.s, y: s.s * 0.7, z: s.s }
+    })
+    MeshRenderer.setBox(e)
+    Material.setPbrMaterial(e, {
+      albedoColor: Color4.fromHexString('#3f3f46'),
+      emissiveColor: Color4.fromHexString('#18181b'),
+      emissiveIntensity: 0.2,
+      roughness: 0.95,
+      metallic: 0.05
+    })
+  }
   flames = [
     fetchEntity(EntityNames.TorchFlame1),
     fetchEntity(EntityNames.TorchFlame2),
@@ -816,10 +1054,14 @@ export function setupGame() {
       if (isChargeFull(held) && timeS >= heavyReadyAt) {
         heavyReadyAt = timeS + HEAVY_COOLDOWN_S
         playSfx('heavy')
+        swingT = 0.35
+        swingHeavy = true
         damageBoss(heavyHitDamage(coreExposed))
       } else if (timeS - lastPlayerAttackAt >= PLAYER_ATTACK_COOLDOWN_S) {
         lastPlayerAttackAt = timeS
         playSfx('hit')
+        swingT = 0.25
+        swingHeavy = false
         damageBoss(bodyHitDamage(coreExposed))
       }
       syncHud()
@@ -841,9 +1083,59 @@ export function setupGame() {
     )
   })
 
+  // v6: floating damage-number pool (billboarded texts, reused).
+  for (let i = 0; i < DAMAGE_NUMBER_POOL; i++) {
+    const e = engine.addEntity()
+    Transform.create(e, { position: { x: 16, y: -10, z: 16 } })
+    TextShape.create(e, { text: '', fontSize: 3, textColor: Color4.White(), width: 4, height: 1 })
+    Billboard.create(e, {})
+    VisibilityComponent.createOrReplace(e, { visible: false })
+    dmgNumbers.push({ entity: e, t: 0, life: DAMAGE_NUMBER_LIFE, color: Color4.White() })
+  }
+
+  // v6: crystal sword in the player's right hand. AvatarAttach follows the
+  // hand bone; the pivot child carries the swing rotation, so the anchor's
+  // own Transform (overridden by the attach) is never touched. Orientation
+  // is a first guess — verify in-world (Shizuu playtest) and tune.
+  weaponAnchor = engine.addEntity()
+  AvatarAttach.create(weaponAnchor, { anchorPointId: AvatarAnchorPointType.AAPT_RIGHT_HAND })
+  VisibilityComponent.createOrReplace(weaponAnchor, { visible: false })
+  weaponPivot = engine.addEntity()
+  Transform.create(weaponPivot, {
+    parent: weaponAnchor,
+    rotation: Quaternion.fromAngleAxis(-0.5, Vector3.Right())
+  })
+  const swordParts: {
+    y: number
+    scale: { x: number; y: number; z: number }
+    color: string
+    glow: number
+  }[] = [
+    { y: 0.05, scale: { x: 0.05, y: 0.18, z: 0.05 }, color: '#1f2937', glow: 0.2 }, // grip
+    { y: 0.15, scale: { x: 0.18, y: 0.03, z: 0.05 }, color: '#f59e0b', glow: 1 }, // guard
+    { y: 0.46, scale: { x: 0.06, y: 0.6, z: 0.02 }, color: '#22d3ee', glow: 2 } // blade
+  ]
+  for (const part of swordParts) {
+    const e = engine.addEntity()
+    Transform.create(e, {
+      parent: weaponPivot,
+      position: { x: 0, y: part.y, z: 0 },
+      scale: part.scale
+    })
+    MeshRenderer.setBox(e)
+    Material.setPbrMaterial(e, {
+      albedoColor: Color4.fromHexString(part.color),
+      emissiveColor: Color4.fromHexString(part.color),
+      emissiveIntensity: part.glow,
+      roughness: 0.3,
+      metallic: 0.2
+    })
+  }
+
   engine.addSystem(bossAnimSystem)
   engine.addSystem(fightSystem)
   engine.addSystem(projectileSystem)
   engine.addSystem(shardSystem)
+  engine.addSystem(damageNumberSystem)
   syncHud()
 }

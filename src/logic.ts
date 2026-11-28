@@ -218,3 +218,29 @@ export const SHARDLING_FIRST_SPAWN_S = 8
 export function shardlingSpawnIntervalS(phase: BossPhase): number {
   return phase === 1 ? 12 : phase === 2 ? 9 : 7
 }
+
+// ------------------------------------------------------------------ golem movement (v6)
+// The golem walks slowly toward the player between attacks, so the fight
+// is no longer a stationary shooting gallery. It stops a few metres out
+// so it never walks onto the player, and plants its feet while a slam
+// telegraph is active.
+/** Golem walk speed, metres per second. */
+export const GOLEM_WALK_SPEED = 0.6
+/** Stop walking this close to the player. */
+export const GOLEM_STOP_DISTANCE = 3
+
+/** Step from (ax, az) toward (bx, bz) by at most maxStep metres. */
+export function stepToward(
+  ax: number,
+  az: number,
+  bx: number,
+  bz: number,
+  maxStep: number
+): { x: number; z: number } {
+  const dx = bx - ax
+  const dz = bz - az
+  const len = Math.hypot(dx, dz)
+  if (len < 0.01 || maxStep <= 0) return { x: ax, z: az }
+  const step = Math.min(maxStep, len)
+  return { x: ax + (dx / len) * step, z: az + (dz / len) * step }
+}
